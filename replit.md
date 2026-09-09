@@ -1,10 +1,11 @@
-# [Project name]
+# Pinterest Video Downloader
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A full-stack utility that turns public Pinterest pin links into direct video download options.
 
 ## Run & Operate
 
 - `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/pinterest-downloader run dev` — run the web app
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
@@ -22,15 +23,21 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/pinterest-downloader/src/App.tsx` — responsive downloader interface and states
+- `artifacts/pinterest-downloader/src/index.css` — soft-pink visual theme and motion
+- `artifacts/api-server/src/routes/download.ts` — Pinterest redirect, metadata, and MP4 extraction
+- `lib/api-spec/openapi.yaml` — source of truth for the download API contract
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Pinterest HTML is fetched server-side with a browser-like user agent so video URLs are never exposed to a client-side cross-origin scrape.
+- `pin.it` links are resolved through the fetch response's final URL before pin validation and extraction.
+- Direct MP4 URLs are deduplicated and quality-labeled from their path, with an `og:video:secure_url` fallback.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Accepts Pinterest pin links and shows title, thumbnail, and downloadable video qualities.
+- Supports loading, empty, error, retry, and success states without sign-in or persistence.
 
 ## User preferences
 
@@ -38,7 +45,7 @@ _Populate as you build — explicit user instructions worth remembering across s
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Pinterest can change its page markup or restrict individual pins; the API reports unreachable and no-video cases separately.
 
 ## Pointers
 

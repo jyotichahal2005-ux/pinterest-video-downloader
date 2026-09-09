@@ -5,19 +5,7 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-export interface HealthStatus {
-  status: string;
-}
-
-export interface DownloadInput {
-  /** @minLength 1 */
-  url: string;
-}
-
-export interface DownloadVideo {
-  url: string;
-  label: string;
-}
+import type { DownloadVideo } from './downloadVideo';
 
 export interface DownloadResult {
   title: string;
@@ -25,8 +13,3 @@ export interface DownloadResult {
   thumbnail: string | null;
   videos: DownloadVideo[];
 }
-
-export interface ErrorResponse {
-  error: string;
-}
-

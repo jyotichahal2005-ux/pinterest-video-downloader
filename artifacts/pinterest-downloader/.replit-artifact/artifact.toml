@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Pinterest Video Downloader"
+description = "A fast, privacy-conscious web app that fetches direct video downloads from Pinterest pin links, showing the pin title, thumbnail, and available video qualities."
+version = "1.0.0"
+id = "artifacts/pinterest-downloader"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25399
+
+[services.development]
+run = "pnpm --filter @workspace/pinterest-downloader run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/pinterest-downloader", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/pinterest-downloader/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25399"
+BASE_PATH = "/"

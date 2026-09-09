@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: downloads
+    description: Pinterest media extraction operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,37 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /download:
+    post:
+      operationId: downloadPinterestVideo
+      tags: [downloads]
+      summary: Extract downloadable videos from a Pinterest pin
+      description: Resolves Pinterest short links, fetches the pin page, and extracts available direct MP4 video URLs and metadata.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DownloadInput"
+      responses:
+        "200":
+          description: Pinterest video metadata and quality options
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DownloadResult"
+        "400":
+          description: Invalid URL or no video found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "502":
+          description: Pinterest could not be reached
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +66,47 @@ components:
           type: string
       required:
         - status
+    DownloadInput:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          minLength: 1
+      required:
+        - url
+    DownloadVideo:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        label:
+          type: string
+      required:
+        - url
+        - label
+    DownloadResult:
+      type: object
+      properties:
+        title:
+          type: string
+        thumbnail:
+          type: ["string", "null"]
+          format: uri
+        videos:
+          type: array
+          items:
+            $ref: "#/components/schemas/DownloadVideo"
+      required:
+        - title
+        - thumbnail
+        - videos
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
 
