@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ffffff" />
+  <title>Contact PinSaver — Pinterest Video Downloader Help</title>
+  <meta name="description" content="Contact the PinSaver team for help with the free Pinterest video downloader - questions, feedback, or feature requests. We read every message." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://pinsaver.app/contact" />
+  <meta property="og:title" content="Contact PinSaver — Pinterest Video Downloader Help" />
+  <meta property="og:description" content="Contact the PinSaver team with questions, feedback, or help using the Pinterest video downloader." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://pinsaver.app/contact" />
+  <meta property="og:image" content="https://pinsaver.app/img/og-image.png?v=2" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://pinsaver.app/img/og-image.png?v=2" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/img/apple-touch-icon.png" />
+  <link rel="stylesheet" href="/css/style.css?v=13" />
+
+  <script type="application/ld+json">
+  {
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  "name": "Contact PinSaver — Pinterest Video Downloader Help",
+  "url": "https://pinsaver.app/contact",
+  "description": "Contact the PinSaver team for help with the free Pinterest video downloader.",
+  "mainEntity": {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "PinSaver",
+    "url": "https://pinsaver.app/",
+    "logo": "https://pinsaver.app/favicon.svg"
+  }
+}
+  </script>
+</head>
+<body>
+  <div data-header></div>
+
+  <main>
+    <section class="content-hero">
+      <div class="wrap">
+        <span class="section-kicker">We read every note</span>
+        <h1>Talk to the <span class="gradient-text">PinSaver team.</span></h1>
+        <p>Have a question about a public pin, a bug to report, or an idea for making the workflow clearer? Send a message or email us directly.</p>
+      </div>
+    </section>
+
+    <div class="wrap contact-grid" style="padding-top:3rem;">
+      <div class="card" style="height:fit-content;">
+        <div class="icon">✉</div>
+        <h3 style="margin-top:1rem;">Email us</h3>
+        <a class="gradient-text" style="font-weight:600;" href="mailto:hello@pinsaver.app">hello@pinsaver.app</a>
+        <p>Your browser's email app will open pre-addressed to us, so your note actually lands in our inbox. For a download issue, include your device and browser.</p>
+        <!--CONTACT-INFO-->
+      </div>
+
+      <form class="form-card" id="contact-form">
+        <div class="form-grid">
+          <div class="field"><label for="c-name">Name</label><input id="c-name" name="name" required /></div>
+          <div class="field"><label for="c-email">Email</label><input id="c-email" type="email" name="email" required /></div>
+        </div>
+        <div class="field" style="margin-top:1.25rem;"><label for="c-message">Message</label><textarea id="c-message" name="message" required></textarea></div>
+        <button class="btn btn-primary" type="submit" style="margin-top:1.25rem;">Send message</button>
+        <div id="form-success" class="form-success" style="display:none;margin-top:1rem;">Your email app is opening with your message. If it didn't open, email <a class="link-inline" href="mailto:hello@pinsaver.app">hello@pinsaver.app</a> directly.</div>
+      </form>
+    </div>
+  </main>
+
+  <div data-footer></div>
+  <script src="/js/layout.js?v=5"></script>
+  <script>
+    document.getElementById("contact-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var name = document.getElementById("c-name").value.trim();
+      var email = document.getElementById("c-email").value.trim();
+      var message = document.getElementById("c-message").value.trim();
+      var subject = encodeURIComponent("Message from " + (name || "a visitor"));
+      var body = encodeURIComponent(
+        "Name: " + name + "\n\n" +
+        "Your email: " + email + "\n\n" +
+        "Message:\n" + message
+      );
+      window.location.href = "mailto:hello@pinsaver.app?subject=" + subject + "&body=" + body;
+      document.getElementById("form-success").style.display = "block";
+      this.reset();
+    });
+  </script>
+</body>
+</html>

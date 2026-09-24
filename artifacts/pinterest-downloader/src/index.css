@@ -205,3 +205,41 @@
   .hero-grid { background-size: 38px 38px; }
   .download-card { border-radius: 1rem; }
 }
+
+.content-shell {
+  position: relative;
+  min-height: 100dvh;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 82% 8%, rgba(131, 49, 165, .16), transparent 28rem),
+    #090910;
+}
+.content-hero {
+  position: relative;
+  background-image: linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: linear-gradient(to bottom, black 0%, black 88%, transparent 100%);
+}
+.content-kicker {
+  color: #ff527c;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.content-card {
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 1.1rem;
+  background: linear-gradient(145deg, rgba(255,255,255,.05), rgba(255,255,255,.018));
+  box-shadow: 0 22px 65px rgba(0,0,0,.16);
+}
+.prose-pinsaver p { color: #a09bab; font-size: 1rem; line-height: 1.85; }
+.prose-pinsaver h2 { color: white; font-family: var(--app-font-serif); font-size: 1.55rem; font-weight: 700; letter-spacing: -.045em; margin-top: 2.6rem; }
+.prose-pinsaver ul { margin-top: 1rem; padding-left: 1.25rem; color: #a09bab; line-height: 1.85; }
+.prose-pinsaver li { padding-left: .3rem; margin-top: .55rem; }
+.prose-pinsaver strong { color: #e9e5ef; font-weight: 600; }
+.article-link { color: #ff6a8d; text-decoration: underline; text-decoration-color: rgba(255,106,141,.38); text-underline-offset: 3px; }
+@media (max-width: 640px) {
+  .content-hero { background-size: 38px 38px; }
+  .prose-pinsaver p { font-size: .95rem; }
+}

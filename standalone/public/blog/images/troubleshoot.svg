@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2d1b0e"/>
+      <stop offset=".55" stop-color="#1f1510"/>
+      <stop offset="1" stop-color="#2a1812"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="16" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="800" height="450" fill="url(#bg)"/>
+  <circle cx="660" cy="90" r="150" fill="#ffa94d" opacity=".12"/>
+  <circle cx="130" cy="390" r="150" fill="#ff6b35" opacity=".1"/>
+  <g filter="url(#glow)">
+    <g transform="translate(300,120) rotate(-18 0 130)">
+      <rect x="-16" y="60" width="150" height="40" rx="10" fill="#c77b3f"/>
+      <rect x="134" y="74" width="46" height="12" rx="6" fill="#9a5d2f"/>
+      <path d="M-16 84 q0 44 40 44 h110 q0 36 42 36 h30 v-80 h-222 z" fill="#e09a5b"/>
+      <path d="M98 88 h64 v24 q0 40 -24 44 q-40 0 -40 -28 v-40 z" fill="#ffb56b"/>
+      <circle cx="64" cy="120" r="7" fill="#6e3f1c"/>
+    </g>
+    <text x="400" y="300" font-family="Arial" font-size="18" font-weight="900" fill="#ffd8ae" text-anchor="middle">Fix it in 5 quick checks</text>
+    <text x="400" y="328" font-family="Arial" font-size="13" fill="#c9a37c" text-anchor="middle">Link · Public pin · Video file · Browser · Permissions</text>
+    <rect x="255" y="352" width="290" height="46" rx="23" fill="#ff6b35" opacity=".2" stroke="#ff6b35" stroke-width="2"/>
+    <text x="400" y="380" font-family="Arial" font-size="14" font-weight="800" fill="#ffd8ae" text-anchor="middle">✓ Wrench · ✓ Checklist · ✓ Works again</text>
+  </g>
+</svg>

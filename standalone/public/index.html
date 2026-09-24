@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ffffff" />
+  <title>Pinterest Video Downloader — Free, No Login | PinSaver</title>
+  <meta name="description" content="Download Pinterest videos free in HD MP4. Paste a public pin link - no login, no watermark, unlimited. Works on iPhone, Android, Windows and Mac." />
+  <meta name="keywords" content="pinterest video downloader, download pinterest videos, pinterest video to mp4, save pinterest videos, pinterest video saver, free pinterest video downloader" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://pinsaver.app/" />
+  <meta property="og:title" content="Pinterest Video Downloader — Free, No Login | PinSaver" />
+  <meta property="og:description" content="Download any public Pinterest video to MP4 in HD. Free, fast, no login, no watermark. Unlimited downloads." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://pinsaver.app/" />
+  <meta property="og:image" content="https://pinsaver.app/img/og-image.png?v=2" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://pinsaver.app/img/og-image.png?v=2" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/img/apple-touch-icon.png" />
+  <link rel="stylesheet" href="/css/style.css?v=13" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "PinSaver — Pinterest Video Downloader",
+    "applicationCategory": "MultimediaApplication",
+    "operatingSystem": "Web",
+    "description": "Free online Pinterest video downloader. Paste a Pinterest pin link and download the public video to MP4 in high quality. No login, no watermark, unlimited downloads.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "url": "https://pinsaver.app/"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "PinSaver",
+    "url": "https://pinsaver.app/"
+  }
+  </script>
+</head>
+<body>
+  <div data-header></div>
+
+  <main>
+    <!-- HERO + DOWNLOADER TOOL -->
+    <section class="hero" id="top">
+      <div class="particles" id="particles"></div>
+
+      <span class="badge"><span class="dot"></span> 100% FREE · NO SIGN-UP · UNLIMITED DOWNLOADS</span>
+      <h1>Download Pinterest Videos <span class="gradient-text">Instantly &amp; Free</span></h1>
+      <p class="lede">Paste any public Pinterest video link and save it to your device in <strong>480p, 720p, or 1080p MP4 quality</strong>. No login, no watermark, no limits. Works on iPhone, Android, Windows and Mac.</p>
+
+      <!-- Download Tool -->
+      <div class="download-card">
+        <form class="download-form" id="download-form">
+          <div class="input-wrap">
+            <span class="marq" aria-hidden="true"><svg class="marq-rect" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><rect x="1" y="1" width="98" height="98" pathLength="100" fill="none" stroke="#a01717" stroke-width="2.5" vector-effect="non-scaling-stroke" stroke-dasharray="3 2.2" /></svg></span>
+            <label for="pinterest-url" class="sr-only">Pinterest video link</label>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5e5a72" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <input id="pinterest-url" type="url" placeholder="Paste your Pinterest video link here..." autocomplete="url" />
+            <button type="button" id="paste-btn" class="paste-btn">Paste</button>
+          </div>
+          <button class="btn btn-primary" type="submit" id="download-btn" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span id="btn-label">Download</span>
+          </button>
+        </form>
+        <p class="download-note">Works with <strong>pin.it</strong> short links and <strong>pinterest.com/pin/</strong> URLs</p>
+        <div class="download-badges">
+          <span><span class="check">✓</span> No login required</span>
+          <span><span class="check">✓</span> 100% watermark free</span>
+          <span><span class="check">✓</span> HD MP4 quality</span>
+          <span><span class="check">✓</span> Unlimited downloads</span>
+        </div>
+        <div class="grab-chips" style="margin-top:.9rem;">
+          <a class="grab-chip" href="/how-it-works">How to download →</a>
+          <a class="grab-chip" href="/faq">Common questions →</a>
+          <a class="grab-chip" href="/blog">Discover more →</a>
+        </div>
+      </div>
+
+      <!-- Result area -->
+      <div class="result-area" id="result">
+        <div class="result-panel empty-state">
+          <div class="big-icon">🔗</div>
+          <h3>Your download will appear here</h3>
+          <p>Paste a Pinterest pin link above and we'll show the title, preview, and available video qualities.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRUST BAR -->
+    <section class="trust-bar" aria-label="What PinSaver offers">
+      <div class="wrap trust-bar" style="padding:0;">
+        <div class="trust-item"><span class="trust-ic">✓</span><div><strong>No login required</strong><small>Use the tool without an account</small></div></div>
+        <div class="trust-item"><span class="trust-ic">✓</span><div><strong>No watermark added</strong><small>The clean source video, as served</small></div></div>
+        <div class="trust-item"><span class="trust-ic">✓</span><div><strong>HD MP4 quality</strong><small>480p, 720p or 1080p where available</small></div></div>
+        <div class="trust-item"><span class="trust-ic">✓</span><div><strong>Free to use</strong><small>No fees, no trial countdown</small></div></div>
+      </div>
+    </section>
+
+    <!-- HOW TO DOWNLOAD -->
+    <section class="section reveal" id="how-to-download">
+      <div class="wrap">
+        <div style="text-align:center;margin-bottom:2rem;">
+          <span class="section-kicker" style="display:inline-flex;">Step-by-step</span>
+          <h2>How to Download Pinterest Videos <span class="gradient-text">with PinSaver</span></h2>
+          <p class="sub" style="margin-left:auto;margin-right:auto;">The same three moves work on your phone or your computer — copy, paste, download. Here is exactly what to tap on every device.</p>
+        </div>
+        <div class="how-cols">
+          <div class="how-col">
+            <h3>📱 From the Pinterest mobile app</h3>
+            <ol>
+              <li><strong>Open the video pin</strong> and tap the <strong>share (arrow) icon</strong>. On the latest Pinterest app, it sits at the bottom right of the screen.</li>
+              <li>Tap <strong>Copy Link</strong>. Pinterest gives you a short <strong>pin.it/...</strong> link — that's exactly what we need.</li>
+              <li><strong>Paste the link</strong> into the PinSaver box above and tap <strong>Download</strong>.</li>
+              <li>See the preview, <strong>choose your quality</strong> (480p, 720p or 1080p where available) and tap the download button.</li>
+              <li>The MP4 lands in your <strong>Files app</strong> (iPhone) or <strong>Downloads / Gallery</strong> (Android).</li>
+            </ol>
+          </div>
+          <div class="how-col">
+            <h3>💻 From a desktop browser</h3>
+            <ol>
+              <li>Open the pin on <strong>pinterest.com</strong> and copy the URL from your <strong>address bar</strong> — it looks like <code>pinterest.com/pin/1234567890/</code>.</li>
+              <li><strong>Paste the link</strong> into the PinSaver box and press <strong>Download</strong> (or press Enter).</li>
+              <li>A preview appears with the pin title, thumbnail, and <strong>every video quality</strong> Pinterest actually serves for that pin.</li>
+              <li>Pick your quality and the file saves to your <strong>Downloads folder</strong> in a few seconds.</li>
+              <li>Drag it anywhere you like — or check <strong>Ctrl+J</strong> to open your download history.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="section reveal" id="how-it-works">
+      <div class="wrap split">
+        <div>
+          <span class="section-kicker">How it works</span>
+          <h2>From pin to file in <span class="gradient-text">three moves.</span></h2>
+          <p class="sub">No unnecessary steps between finding something great and making it yours.</p>
+          <a class="link-more" href="/about">About PinSaver →</a>
+        </div>
+        <div class="steps">
+          <div class="step"><span class="step-number">01</span><div><h3>Copy the pin link</h3><p>Open the Pinterest pin you want and copy its URL. On mobile, tap Share → Copy Link.</p></div></div>
+          <div class="step"><span class="step-number">02</span><div><h3>Paste it above</h3><p>Drop the link into PinSaver and press Download. We read the pin and list every video file available.</p></div></div>
+          <div class="step"><span class="step-number">03</span><div><h3>Choose and save</h3><p>Select the quality you want — 480p, 720p or 1080p where available — and the MP4 saves straight to your device.</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="section alt reveal" id="features">
+      <div class="wrap">
+        <div style="text-align:center;margin-bottom:2rem;">
+          <span class="section-kicker" style="display:inline-flex;">Why people choose PinSaver</span>
+          <h2>Every reason to make PinSaver your <span class="gradient-text">video saver.</span></h2>
+          <p class="sub" style="margin-left:auto;margin-right:auto;">Fast, private and simple — and 100% free, forever.</p>
+        </div>
+        <div class="grid-3">
+          <div class="card"><div class="icon">⚡</div><h3>One-click simple</h3><p>No account, no maze of buttons, no installs. Paste a pin link and get straight to the MP4 file.</p></div>
+          <div class="card"><div class="icon">🛡️</div><h3>Private by default</h3><p>Your link is used only to read the pin you asked for. No tracking, no history, no saved copies.</p></div>
+          <div class="card"><div class="icon">⬇️</div><h3>HD quality options</h3><p>480p, 720p or 1080p — pick the version that best fits your screen and storage.</p></div>
+          <div class="card"><div class="icon">✨</div><h3>No watermark</h3><p>What you download is the same clean source video Pinterest serves for that public pin.</p></div>
+          <div class="card"><div class="icon">📱</div><h3>Works on every device</h3><p>iPhone, Android, Windows, Mac, tablets — any modern browser, no app to install.</p></div>
+          <div class="card"><div class="icon">🧾</div><h3>Free forever</h3><p>No paid plan, no trial countdown, no download caps. Save as many public videos as you want.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- USE CASES -->
+    <section class="section reveal" id="use-cases">
+      <div class="wrap">
+        <div style="text-align:center;margin-bottom:2rem;">
+          <span class="section-kicker" style="display:inline-flex;">Who uses PinSaver</span>
+          <h2>What people love to <span class="gradient-text">save.</span></h2>
+        </div>
+        <div class="grid-3">
+          <div class="card"><div class="icon">🍳</div><h3>Recipe &amp; cooking</h3><p>Watch step-by-step recipe videos in the kitchen, without wifi or autoplay.</p></div>
+          <div class="card"><div class="icon">🏋️</div><h3>Workouts &amp; wellness</h3><p>Keep home workout, stretching and yoga videos locally to repeat anytime.</p></div>
+          <div class="card"><div class="icon">🛠️</div><h3>DIY &amp; tutorials</h3><p>Save repair, craft and decor tutorials so instructions never disappear.</p></div>
+          <div class="card"><div class="icon">🎨</div><h3>Art &amp; inspiration</h3><p>Watercolor, sketching and design videos as offline study material.</p></div>
+          <div class="card"><div class="icon">🧳</div><h3>Travel &amp; places</h3><p>Save destination guides before a trip and re-watch on the go.</p></div>
+          <div class="card"><div class="icon">🌱</div><h3>Home &amp; garden</h3><p>Gardening and organizing videos as a reference library that never buffers.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHAT WORKS -->
+    <section class="section alt reveal" id="what-works">
+      <div class="wrap">
+        <div style="text-align:center;margin-bottom:2rem;">
+          <span class="section-kicker" style="display:inline-flex;">Honest about the limits</span>
+          <h2>What works — and what <span class="gradient-text">does not.</span></h2>
+          <p class="sub" style="margin-left:auto;margin-right:auto;">PinSaver works with publicly accessible Pinterest videos. Like any honest downloader, it does not bypass access controls — that is why it can be free and safe to use every day.</p>
+        </div>
+        <table class="cmp-table">
+          <thead>
+            <tr><th>What works</th><th>What does not work</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="ok">Public Pinterest pin links, including full <code>pinterest.com/pin/...</code> URLs and short <code>pin.it</code> share links</td>
+              <td class="no">Private, secret, login-only, restricted, or deleted pins</td>
+            </tr>
+            <tr>
+              <td class="ok">Public video pins — we list every MP4 that Pinterest serves, usually 480p, 720p or 1080p</td>
+              <td class="no">Pinterest invitation or board-collaboration links that require you to be a member</td>
+            </tr>
+            <tr>
+              <td class="ok">Links pasted from the Pinterest mobile app (Share → Copy Link)</td>
+              <td class="no">Bypassing Pinterest access controls or permissions</td>
+            </tr>
+            <tr>
+              <td class="ok">Photo-only pins return a clear "no video found" message instead of a broken download</td>
+              <td class="no">Creating or upscaling a resolution that Pinterest does not provide — we return the source quality as-is</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="url-chips">
+          <span class="url-chip">pinterest.com/pin/123456789012345678/</span>
+          <span class="url-chip">pin.it/abc123</span>
+          <span class="url-chip">in.pinterest.com/pin/987654321098765432/</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SAFETY -->
+    <section class="section reveal" id="safety">
+      <div class="wrap">
+        <div style="text-align:center;margin-bottom:2rem;">
+          <span class="section-kicker" style="display:inline-flex;">Safe by design</span>
+          <h2>Safe, private and <span class="gradient-text">responsible.</span></h2>
+        </div>
+        <div class="disc-col">
+          <div class="card"><div class="icon">🛡️</div><h3>Private by default</h3><p>PinSaver never asks for your Pinterest username or password. Your link is used only to read the pin you asked for — no tracking, no history, no saved copies, no profile access.</p></div>
+          <div class="card"><div class="icon">🧾</div><h3>Responsible use</h3><p>Public content is not automatically copyright-free. Download only videos you own or are authorized to keep, for personal use, and respect creators' rights and Pinterest's terms.</p></div>
+          <div class="card"><div class="icon">🔗</div><h3>Only public links</h3><p>If a pin is private, secret, or removed, no downloader should open it — and PinSaver doesn't try. We work with whatever the public <strong>pin page</strong> makes available.</p></div>
+          <div class="card"><div class="icon">💾</div><h3>Named per quality</h3><p>Every download button is labeled with the real resolution (like 720p). What you click is the actual source file Pinterest serves for that pin — never re-encoded, never watermarked.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section alt reveal" id="faq">
+      <div class="wrap split" style="grid-template-columns:0.7fr 1.3fr;">
+        <div>
+          <span class="section-kicker">Good to know</span>
+          <h2>Questions, <span class="gradient-text">answered.</span></h2>
+          <p class="sub">The most common questions about downloading Pinterest videos. More on the <a class="link-inline" href="/faq">FAQ page</a>.</p>
+        </div>
+        <div class="faq-list">
+          <div class="faq-item open"><button class="faq-q">Is PinSaver free to use?<span class="plus">+</span></button><div class="faq-a">Yes. PinSaver is 100% free with no account, no subscription and no download limits. Save as many public Pinterest videos as you like.</div></div>
+          <div class="faq-item"><button class="faq-q">What kind of Pinterest links work?<span class="plus">+</span></button><div class="faq-a">Public pin links work best, including full pinterest.com/pin/... URLs and short pin.it share links. Private or removed pins cannot be fetched.</div></div>
+          <div class="faq-item"><button class="faq-q">What video quality can I download?<span class="plus">+</span></button><div class="faq-a">You get whatever versions Pinterest actually serves for the pin — commonly 480p, 720p or 1080p. PinSaver lists them all.</div></div>
+          <div class="faq-item"><button class="faq-q">Where are my files saved?<span class="plus">+</span></button><div class="faq-a">Downloads go straight to your browser's normal download location — Files app on iPhone, Downloads folder on Android and desktop. We never keep a copy.</div></div>
+          <div class="faq-item"><button class="faq-q">Why did my pin return no video?<span class="plus">+</span></button><div class="faq-a">The pin may be an image, not a video, or it may be removed, private, or restricted. Try copying the link again from the pin's Share menu.</div></div>
+          <div class="faq-item"><button class="faq-q">Is downloading Pinterest videos allowed?<span class="plus">+</span></button><div class="faq-a">PinSaver is for personal saving of public content you are allowed to keep. Always respect the creator's rights and Pinterest's terms.</div></div>
+          <div class="faq-item"><button class="faq-q">Does the Pinterest link need to be public?<span class="plus">+</span></button><div class="faq-a">Yes. PinSaver processes publicly accessible pin links. Private, secret, login-only, restricted, and deleted content cannot be accessed — and we don't try to bypass access controls.</div></div>
+          <div class="faq-item"><button class="faq-q">Does PinSaver work on mobile?<span class="plus">+</span></button><div class="faq-a">Yes. It works in any modern browser on iPhone, Android, Windows, Mac, and tablets — no app to install. On iPhone, use the Share menu to save the MP4 to your Photos if you prefer the camera roll.</div></div>
+          <div class="faq-item"><button class="faq-q">Does PinSaver store my files or link?<span class="plus">+</span></button><div class="faq-a">No. Your link is used only to read the pin's public page so we can build the download list. Files are never hosted on our servers — downloads come straight to your device.</div></div>
+          <div class="faq-item"><button class="faq-q">Can I download images or GIFs with PinSaver?<span class="plus">+</span></button><div class="faq-a">Currently PinSaver focuses on videos. If a pin is a photo rather than a video, you'll see a clear "no video found" message instead of a broken download.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BLOG PREVIEW -->
+    <section class="section reveal" id="blog-preview">
+      <div class="wrap">
+        <div style="text-align:center;margin-bottom:2rem;">
+          <span class="section-kicker" style="display:inline-flex;">From the blog</span>
+          <h2>Guides worth <span class="gradient-text">reading.</span></h2>
+          <p class="sub" style="margin-left:auto;margin-right:auto;">Step-by-step tutorials for every device and every quality question.</p>
+        </div>
+        <div class="blog-grid">
+          <a class="blog-card" href="/blog/iphone-pinterest-video-download" data-category="device">
+            <div class="blog-card-image">
+              <img class="blog-img" src="/blog/images/iphone.svg" alt="Download Pinterest videos on iPhone" loading="lazy" style="background:linear-gradient(135deg,#fee2e2,#fecdd3,#fca5a5);">
+            </div>
+            <div class="card-content">
+              <div class="meta"><span>Device Guides</span><span>6 min read</span></div>
+              <h3>How to Download Pinterest Videos on iPhone (2026 Guide)</h3>
+              <p>Save Pinterest videos on an iPhone without installing any app.</p>
+              <div class="card-foot"><span class="avatar">PS</span><span class="byline">PinSaver Team</span></div>
+              <span class="cta">Read the guide <span class="arrow">→</span></span>
+            </div>
+          </a>
+          <a class="blog-card" href="/blog/android-pinterest-video-download" data-category="device">
+            <div class="blog-card-image">
+              <img class="blog-img" src="/blog/images/android.svg" alt="Save Pinterest videos on Android" loading="lazy" style="background:linear-gradient(135deg,#fecaca,#fda4af,#fca5a5);">
+            </div>
+            <div class="card-content">
+              <div class="meta"><span>Device Guides</span><span>6 min read</span></div>
+              <h3>How to Save Pinterest Videos on Android Without Any App</h3>
+              <p>Use your Android browser, the share menu, and your Downloads folder.</p>
+              <div class="card-foot"><span class="avatar">PS</span><span class="byline">PinSaver Team</span></div>
+              <span class="cta">Read the guide <span class="arrow">→</span></span>
+            </div>
+          </a>
+        </div>
+        <div style="text-align:center;margin-top:2rem;">
+          <a class="btn btn-primary" href="/blog">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            Explore all guides
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-band">
+      <div class="wrap">
+        <div class="cta-box">
+          <h2>Ready to save your first Pinterest video?</h2>
+          <p>Paste a public Pinterest link above and get the MP4 straight to your device — free, fast, and watermark-free.</p>
+          <a class="btn btn-primary" href="#top" style="margin-top:1.5rem;">Start downloading</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div data-footer></div>
+  <script src="/js/layout.js?v=5"></script>
+  <script src="/js/app.js"></script>
+  <script>
+    (function() {
+      var c = document.getElementById('particles');
+      if (!c) return;
+      var colors = ['#c92a2a', '#b91c1c', '#8c1616', '#e04545', '#fecaca'];
+      var n = window.innerWidth < 768 ? 15 : 30;
+      for (var i = 0; i < n; i++) {
+        var p = document.createElement('div');
+        p.className = 'particle';
+        var s = Math.random() * 4 + 2;
+        var col = colors[Math.floor(Math.random() * colors.length)];
+        p.style.cssText = 'width:' + s + 'px;height:' + s + 'px;left:' + Math.random()*100 + '%;background:' + col + ';box-shadow:0 0 ' + s*3 + 'px ' + col + ';animation-duration:' + (Math.random()*15+10) + 's;animation-delay:' + Math.random()*10 + 's;';
+        c.appendChild(p);
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Blog Admin — PinSaver CMS</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/img/apple-touch-icon.png" />
+  <link rel="stylesheet" href="/css/admin.css?v=12" />
+</head>
+<body class="admin-page">
+  <div class="admin-shell">
+    <aside class="side-nav">
+      <a class="dash-brand" href="/admin">
+        <span class="admin-brand-mark">p</span>
+        <span>Pin<span class="accent-text">Saver</span> CMS</span>
+      </a>
+      <div class="side-search">
+        <svg class="dash-search-icon" viewBox="0 0 24 24" width="15" height="15" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input id="dash-search" type="search" placeholder="Search blogs..." autocomplete="off" />
+      </div>
+      <nav class="side-links" aria-label="Admin navigation">
+        <button type="button" class="side-link is-active" data-nav="dashboard">Total Blogs</button>
+        <button type="button" class="side-link" data-nav="blog">Blog</button>
+        <button type="button" class="side-link" data-nav="settings">Settings</button>
+      </nav>
+      <a class="side-link side-view-site" href="/?from=admin" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        View Site
+      </a>
+      <button type="button" class="side-link side-logout" id="logout-btn">Log out</button>
+    </aside>
+
+    <main class="side-content">
+
+      <section class="dash-view" id="view-dashboard" aria-label="Dashboard">
+        <div class="dash-inner">
+          <div class="dash-stats-wrap">
+            <button type="button" class="stat-card is-active" data-stat="all">
+              <span class="stat-num" id="stat-total">0</span>
+              <span class="stat-label">Total Blogs</span>
+              <span class="stat-sub">Saare blogs ka count</span>
+            </button>
+            <button type="button" class="stat-card" data-stat="published">
+              <span class="stat-dot dot-published"></span>
+              <span class="stat-num" id="stat-published">0</span>
+              <span class="stat-label">Published</span>
+              <span class="stat-sub">Live blogs</span>
+            </button>
+            <button type="button" class="stat-card" data-stat="draft">
+              <span class="stat-dot dot-draft"></span>
+              <span class="stat-num" id="stat-draft">0</span>
+              <span class="stat-label">Draft</span>
+              <span class="stat-sub">Abhi tak publish nahi hue</span>
+            </button>
+          </div>
+
+          <div class="dash-panel">
+            <div class="dash-panel-head">
+              <div>
+                <h2 class="dash-panel-title" id="dash-list-title">All Blogs</h2>
+                <p class="dash-panel-sub" id="dash-list-sub">Neeche blog ki list search aur filter hote dikhegi.</p>
+              </div>
+              <button type="button" class="admin-btn admin-btn-primary" id="dash-new"><span aria-hidden="true">＋</span> New Blog</button>
+            </div>
+            <div class="dash-list" id="dash-blog-list">
+              <div class="dash-empty">Load ho raha hai...</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="dash-view is-hidden" id="view-blog">
+        <div class="blog-head">
+          <h1 class="blog-title" id="form-title">Create New Post</h1>
+          <div class="admin-topbar-actions">
+            <button type="button" class="admin-btn admin-btn-outline admin-btn-sm" id="blog-back-btn">← Back to Blogs</button>
+            <button type="submit" class="admin-btn admin-btn-outline" form="post-form" id="btn-draft" value="draft">Save Draft</button>
+            <button type="submit" class="admin-btn admin-btn-primary" form="post-form" id="btn-publish" value="publish">Publish</button>
+          </div>
+        </div>
+
+        <div class="admin-main">
+          <div class="admin-toolbar">
+            <div>
+              <p class="admin-subtitle">Write, preview and publish — everything stores straight into the blog.</p>
+              <span class="admin-status" id="save-status" role="status" aria-live="polite"></span>
+            </div>
+            <div class="admin-toolbar-actions">
+              <span class="ai-badge" id="ai-badge" hidden></span>
+            </div>
+          </div>
+
+          <select id="post-picker" class="admin-select" hidden>
+            <option value="">— Select a post —</option>
+          </select>
+
+    <form id="post-form" class="admin-grid" novalidate>
+
+      <!-- LEFT COLUMN -->
+      <div class="admin-col admin-col-main">
+
+        <section class="admin-card">
+          <label class="admin-field-label" for="post-title">Title</label>
+          <input id="post-title" class="admin-input admin-input-lg" type="text"
+                 placeholder="e.g. How to Download Pinterest Videos on iPhone" autocomplete="off" />
+        </section>
+
+        <section class="admin-card">
+          <label class="admin-field-label" for="post-slug">URL slug</label>
+          <div class="admin-slug-wrap">
+            <span class="admin-slug-prefix">/blog/</span>
+            <input id="post-slug" class="admin-input" type="text" placeholder="auto-generated-from-title"
+                   autocomplete="off" spellcheck="false" />
+          </div>
+          <p class="admin-hint">Auto-generated from the title. You can still edit it manually.</p>
+        </section>
+
+        <section class="admin-card">
+          <div class="admin-card-head">
+            <label class="admin-field-label" for="post-content" style="margin:0;">Content</label>
+            <div class="admin-card-tools">
+              <span class="admin-chip-hint">Markdown supported</span>
+              <button type="button" class="admin-btn admin-btn-accent admin-btn-sm" data-ai="outline">AI Outline</button>
+              <button type="button" class="admin-btn admin-btn-accent admin-btn-sm" data-ai="content">AI Write</button>
+              <button type="button" class="admin-btn admin-btn-accent admin-btn-sm" data-ai="improve">AI Improve</button>
+              <button type="button" class="admin-btn admin-btn-outline admin-btn-sm" id="preview-toggle">Live preview</button>
+            </div>
+          </div>
+          <textarea id="post-content" class="admin-textarea admin-textarea-lg" rows="18"
+                    placeholder="Write your article in Markdown...&#10;&#10;## Heading&#10;Write your paragraph here. Use **bold**, _italic_, [links](https://...)."></textarea>
+          <div class="admin-preview" id="content-preview" hidden></div>
+        </section>
+
+        <section class="admin-card">
+          <div class="admin-card-head">
+            <label class="admin-field-label" for="post-excerpt" style="margin:0;">Excerpt</label>
+            <button type="button" class="admin-btn admin-btn-accent admin-btn-sm" data-ai="excerpt">AI Write</button>
+          </div>
+          <textarea id="post-excerpt" class="admin-textarea" rows="3"
+                    placeholder="1-2 sentence summary shown on the blog listing page."></textarea>
+        </section>
+
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="admin-col admin-col-side">
+
+        <section class="admin-card">
+          <div class="admin-card-head">
+            <label class="admin-field-label" style="margin:0;">Category & Author</label>
+          </div>
+          <div class="admin-field">
+            <label class="admin-field-label" for="post-category">Category</label>
+            <select id="post-category" class="admin-select">
+              <option value="device">Device Guides</option>
+              <option value="tips" selected>Tips & How-To</option>
+              <option value="troubleshoot">Troubleshooting & Legal</option>
+            </select>
+          </div>
+          <div class="admin-field">
+            <label class="admin-field-label" for="post-author">Author</label>
+            <input id="post-author" class="admin-input" type="text" placeholder="PinSaver Team" />
+          </div>
+        </section>
+
+        <section class="admin-card">
+          <div class="admin-card-head">
+            <label class="admin-field-label" style="margin:0;">Cover image</label>
+          </div>
+          <div class="cover-preview" id="cover-preview">
+            <div class="cover-placeholder" id="cover-placeholder">Image preview</div>
+            <img id="cover-image" alt="Cover preview" hidden />
+          </div>
+          <div class="admin-field" style="margin-top:.75rem;">
+            <label class="admin-field-label" for="cover-url">Image URL</label>
+            <input id="cover-url" class="admin-input" type="url" placeholder="https://img.example.com/cover.jpg"
+                   autocomplete="off" />
+          </div>
+        </section>
+
+        <section class="admin-card">
+          <div class="admin-card-head">
+            <label class="admin-field-label" style="margin:0;">Tags</label>
+            <button type="button" class="admin-btn admin-btn-accent admin-btn-sm" data-ai="tags">Suggest tags</button>
+          </div>
+          <div class="tags-input" id="tags-input">
+            <input id="tags-field" class="admin-input" type="text" placeholder="Type a tag and press Enter"
+                   autocomplete="off" />
+          </div>
+          <div class="tags-list" id="tags-list"></div>
+          <p class="admin-hint">Press Enter or comma to add. Click × to remove.</p>
+        </section>
+
+        <section class="admin-card">
+          <div class="admin-card-head">
+            <label class="admin-field-label" style="margin:0;">FAQ</label>
+            <div class="admin-card-tools">
+              <button type="button" class="admin-btn admin-btn-accent admin-btn-sm" data-ai="faqs">AI Generate</button>
+              <button type="button" class="admin-btn admin-btn-accent admin-btn-sm" id="add-faq-btn">+ Add FAQ</button>
+            </div>
+          </div>
+          <div class="faq-list" id="faq-list"></div>
+        </section>
+
+        <section class="admin-card">
+          <div class="admin-card-head">
+            <label class="admin-field-label" style="margin:0;">SEO overview</label>
+            <button type="button" class="admin-btn admin-btn-accent admin-btn-sm" data-ai="seo">Write with AI</button>
+          </div>
+          <div class="admin-field">
+            <label class="admin-field-label" for="meta-title">Meta title</label>
+            <input id="meta-title" class="admin-input" type="text" maxlength="200" autocomplete="off" />
+            <div class="char-counter" id="meta-title-count">0 / 60</div>
+          </div>
+          <div class="admin-field">
+            <label class="admin-field-label" for="meta-desc">Meta description</label>
+            <textarea id="meta-desc" class="admin-textarea" rows="3" maxlength="320"></textarea>
+            <div class="char-counter" id="meta-desc-count">0 / 160</div>
+          </div>
+        </section>
+
+      </div>
+
+      <input type="hidden" id="post-id" />
+    </form>
+        </div>
+      </div>
+
+      <div class="dash-view is-hidden" id="view-settings">
+        <div class="blog-head">
+          <h1 class="blog-title">Settings</h1>
+          <p class="admin-subtitle">Site settings yahan se badlo — changes foran live ho jate hain.</p>
+        </div>
+        <div class="admin-main">
+
+          <section class="admin-card">
+            <div class="admin-card-head">
+              <label class="admin-field-label" style="margin:0;">Site SEO</label>
+            </div>
+            <div class="admin-field">
+              <label class="admin-field-label" for="set-site-title">Site Title</label>
+              <input id="set-site-title" class="admin-input" type="text" placeholder="PinSaver" maxlength="120" autocomplete="off" />
+            </div>
+            <div class="admin-field">
+              <label class="admin-field-label" for="set-meta-desc">Default Meta Description</label>
+              <textarea id="set-meta-desc" class="admin-textarea" rows="3" maxlength="320" placeholder="Fallback description for pages without their own"></textarea>
+            </div>
+            <div class="admin-field">
+              <label class="admin-field-label" for="set-og-image">Default OG / share image URL</label>
+              <input id="set-og-image" class="admin-input" type="url" placeholder="https://pinsaver.app/img/og-image.png?v=2" autocomplete="off" />
+            </div>
+            <div class="admin-card-toolbar">
+              <button type="button" class="admin-btn admin-btn-primary" data-save="seo">Save Changes</button>
+              <span class="admin-status" id="status-seo"></span>
+            </div>
+          </section>
+
+          <section class="admin-card">
+            <div class="admin-card-head">
+              <label class="admin-field-label" style="margin:0;">Analytics &amp; Search Console</label>
+            </div>
+            <div class="admin-field">
+              <label class="admin-field-label" for="set-ga-id">Google Analytics Measurement ID</label>
+              <input id="set-ga-id" class="admin-input" type="text" placeholder="G-XXXXXXXXXX" maxlength="50" autocomplete="off" />
+              <p class="admin-hint">Bharne par GA tracking script automatically har page ke head me add ho jata hai.</p>
+            </div>
+            <div class="admin-field">
+              <label class="admin-field-label" for="set-gsc-tag">Google Search Console verification meta tag</label>
+              <textarea id="set-gsc-tag" class="admin-textarea" rows="2" placeholder='&lt;meta name="google-site-verification" content="..." /&gt;'></textarea>
+              <p class="admin-hint">Poora meta tag paste karo — yahan save karte hi site ke head me add ho jata hai.</p>
+            </div>
+            <div class="admin-card-toolbar">
+              <button type="button" class="admin-btn admin-btn-primary" data-save="analytics">Save Changes</button>
+              <span class="admin-status" id="status-analytics"></span>
+            </div>
+          </section>
+
+          <section class="admin-card">
+            <div class="admin-card-head">
+              <label class="admin-field-label" style="margin:0;">Social Links</label>
+            </div>
+            <p class="admin-hint" style="margin-top:.25rem;">Bharne par footer ke "Connect With Us" area me icons dikhte hain. Khaali chhodne par hidden rehte hain.</p>
+            <div class="admin-field">
+              <label class="admin-field-label" for="set-instagram">Instagram URL</label>
+              <input id="set-instagram" class="admin-input" type="url" placeholder="https://instagram.com/yourname" autocomplete="off" />
+            </div>
+            <div class="admin-field">
+              <label class="admin-field-label" for="set-twitter">Twitter / X URL</label>
+              <input id="set-twitter" class="admin-input" type="url" placeholder="https://x.com/yourname" autocomplete="off" />
+            </div>
+            <div class="admin-field">
+              <label class="admin-field-label" for="set-youtube">YouTube URL</label>
+              <input id="set-youtube" class="admin-input" type="url" placeholder="https://youtube.com/@yourname" autocomplete="off" />
+            </div>
+            <div class="admin-field">
+              <label class="admin-field-label" for="set-facebook">Facebook URL</label>
+              <input id="set-facebook" class="admin-input" type="url" placeholder="https://facebook.com/yourname" autocomplete="off" />
+            </div>
+            <div class="admin-card-toolbar">
+              <button type="button" class="admin-btn admin-btn-primary" data-save="social">Save Changes</button>
+              <span class="admin-status" id="status-social"></span>
+            </div>
+          </section>
+
+          <section class="admin-card">
+            <div class="admin-card-head">
+              <label class="admin-field-label" style="margin:0;">Contact Info</label>
+            </div>
+            <p class="admin-hint" style="margin-top:.25rem;">Ye /contact page aur footer me dikhaya jata hai.</p>
+            <div class="admin-field">
+              <label class="admin-field-label" for="set-support-email">Support email</label>
+              <input id="set-support-email" class="admin-input" type="email" placeholder="hello@pinsaver.app" autocomplete="off" />
+            </div>
+            <div class="admin-field">
+              <label class="admin-field-label" for="set-support-phone">Phone / WhatsApp number</label>
+              <input id="set-support-phone" class="admin-input" type="tel" placeholder="+91 12345 67890" autocomplete="off" />
+            </div>
+            <div class="admin-card-toolbar">
+              <button type="button" class="admin-btn admin-btn-primary" data-save="contact">Save Changes</button>
+              <span class="admin-status" id="status-contact"></span>
+            </div>
+          </section>
+
+          <section class="admin-card">
+            <div class="admin-card-head">
+              <label class="admin-field-label" style="margin:0;">Admin Account</label>
+            </div>
+            <p class="admin-hint" style="margin-top:.25rem;">Password yahan se badlne ke baad se hi naya password chalta hai (secure hash me saved).</p>
+            <div class="admin-field">
+              <label class="admin-field-label" for="pw-current">Current password</label>
+              <input id="pw-current" class="admin-input" type="password" autocomplete="current-password" />
+            </div>
+            <div class="admin-field">
+              <label class="admin-field-label" for="pw-new">New password</label>
+              <input id="pw-new" class="admin-input" type="password" autocomplete="new-password" />
+            </div>
+            <div class="admin-field">
+              <label class="admin-field-label" for="pw-confirm">Confirm new password</label>
+              <input id="pw-confirm" class="admin-input" type="password" autocomplete="new-password" />
+            </div>
+            <div class="admin-card-toolbar">
+              <button type="button" class="admin-btn admin-btn-primary" id="btn-change-password">Change Password</button>
+              <span class="admin-status" id="status-password"></span>
+            </div>
+          </section>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <div class="auth-gate" id="auth-gate" hidden>
+    <div class="auth-gate-card">
+      <span class="admin-brand-mark">p</span>
+      <h2 class="auth-gate-title">Admin login</h2>
+      <p class="auth-gate-note">This blog CMS is protected. Enter your admin email and password to unlock it.</p>
+      <input id="auth-user" class="admin-input" type="email" placeholder="Admin email" autocomplete="username" />
+      <input id="auth-pass" class="admin-input" type="password" placeholder="Admin password" autocomplete="current-password" style="margin-top:.5rem;" />
+      <button type="button" class="admin-btn admin-btn-primary" id="auth-btn" style="width:100%;margin-top:.5rem;">Unlock</button>
+      <span class="admin-status" id="auth-status" role="status" aria-live="polite"></span>
+    </div>
+  </div>
+
+  <script src="/js/admin.js?v=8"></script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a1a2e"/>
+      <stop offset=".55" stop-color="#1f1520"/>
+      <stop offset="1" stop-color="#161225"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffd166"/>
+      <stop offset="1" stop-color="#c98910"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="16" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="800" height="450" fill="url(#bg)"/>
+  <circle cx="680" cy="70" r="150" fill="#ffd166" opacity=".08"/>
+  <circle cx="110" cy="400" r="150" fill="#c74dff" opacity=".08"/>
+  <g filter="url(#glow)">
+    <line x1="240" y1="380" x2="560" y2="380" stroke="#8c6f1f" stroke-width="14" stroke-linecap="round"/>
+    <line x1="400" y1="380" x2="400" y2="150" stroke="#8c6f1f" stroke-width="12"/>
+    <path d="M400 132 q-6 -20 -26 -22 q24 -4 26 22 m0 0 q6 -20 26 -22 q-24 -4 -26 22 z" fill="url(#gold)"/>
+    <line x1="298" y1="196" x2="160" y2="330" stroke="#8c6f1f" stroke-width="10"/>
+    <line x1="502" y1="196" x2="640" y2="330" stroke="#8c6f1f" stroke-width="10"/>
+    <path d="M200 330 q-40 0 -40 50 h80 q0 -50 -40 -50 z" fill="#3a3555"/>
+    <path d="M200 330 q-20 0 -20 30 h40 q0 -30 -20 -30 z" fill="#ffd166" opacity=".35"/>
+    <path d="M600 330 q40 0 40 50 h-80 q0 -50 40 -50 z" fill="#3a3555"/>
+    <path d="M600 330 q20 0 20 30 h-40 q0 -30 20 -30 z" fill="#ffd166" opacity=".35"/>
+    <rect x="350" y="210" width="100" height="150" rx="6" fill="#1d1930" stroke="#8c6f1f" stroke-width="4"/>
+    <text x="400" y="278" font-family="Arial" font-size="17" font-weight="900" fill="#ffd166" text-anchor="middle">RESPECT.</text>
+    <text x="400" y="302" font-family="Arial" font-size="10" fill="#a49477" text-anchor="middle">personal use only</text>
+    <text x="400" y="84" font-family="Arial" font-size="16" font-weight="800" fill="#e9e5ef" text-anchor="middle">Attribution · Permission · Personal saving</text>
+  </g>
+</svg>

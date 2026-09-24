@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a0525"/>
+      <stop offset=".6" stop-color="#2b1055"/>
+      <stop offset="1" stop-color="#0f3460"/>
+    </linearGradient>
+    <linearGradient id="bars" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff2d6b"/>
+      <stop offset="1" stop-color="#c74dff"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="18" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="800" height="450" fill="url(#bg)"/>
+  <circle cx="660" cy="80" r="150" fill="#c74dff" opacity=".14"/>
+  <circle cx="120" cy="380" r="150" fill="#ff2d6b" opacity=".1"/>
+  <g filter="url(#glow)">
+    <rect x="150" y="150" width="70" height="130" rx="10" fill="url(#bars)" opacity=".55"/>
+    <rect x="255" y="120" width="70" height="160" rx="10" fill="url(#bars)" opacity=".75"/>
+    <rect x="360" y="82" width="70" height="198" rx="10" fill="url(#bars)"/>
+    <text x="185" y="132" font-family="Arial" font-size="16" font-weight="800" fill="#c9a3ff">480</text>
+    <text x="290" y="102" font-family="Arial" font-size="16" font-weight="800" fill="#e7c6ff">720</text>
+    <text x="395" y="64" font-family="Arial" font-size="18" font-weight="900" fill="#fff">1080</text>
+    <rect x="330" y="252" width="6" height="26" fill="#fff" opacity="0"/>
+    <rect x="150" y="310" width="280" height="8" rx="4" fill="#fff" opacity=".25"/>
+  </g>
+  <g filter="url(#glow)">
+    <circle cx="600" cy="170" r="72" fill="none" stroke="#ff2d6b" stroke-width="8"/>
+    <circle cx="600" cy="170" r="72" fill="#c74dff" opacity=".15"/>
+    <text x="600" y="162" font-family="Arial" font-size="22" font-weight="900" fill="#fff" text-anchor="middle">HD</text>
+    <text x="600" y="186" font-family="Arial" font-size="13" font-weight="700" fill="#ffb1ca" text-anchor="middle">720p · 1080p</text>
+    <text x="600" y="330" font-family="Arial" font-size="15" font-weight="800" fill="#e7c6ff" text-anchor="middle">Highest available quality</text>
+  </g>
+</svg>

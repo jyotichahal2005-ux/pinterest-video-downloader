@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d1117"/>
+      <stop offset=".6" stop-color="#161b22"/>
+      <stop offset="1" stop-color="#0f1923"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="16" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="800" height="450" fill="url(#bg)"/>
+  <circle cx="680" cy="390" r="150" fill="#ff2d6b" opacity=".1"/>
+  <circle cx="120" cy="70" r="140" fill="#c74dff" opacity=".1"/>
+  <g filter="url(#glow)">
+    <rect x="230" y="110" width="340" height="200" rx="14" fill="#0a0f16" stroke="#3a4560" stroke-width="5"/>
+    <path d="M230 150 h340" stroke="#3a4560" stroke-width="5"/>
+    <circle cx="260" cy="133" r="9" fill="#ff5257"/>
+    <circle cx="285" cy="133" r="9" fill="#ffc140"/>
+    <circle cx="310" cy="133" r="9" fill="#00e896"/>
+    <rect x="255" y="180" width="130" height="74" rx="8" fill="#1c2740"/>
+    <text x="250" y="220" font-family="Arial" font-size="12" fill="#7dffc4">
+      <tspan x="258" y="218">▶</tspan>
+    </text>
+    <line x1="462" y1="180" x2="462" y2="254" stroke="#ffd166" stroke-width="4" stroke-dasharray="8 8"/>
+    <text x="472" y="210" font-family="Arial" font-size="12" font-weight="800" fill="#ffd166">no added</text>
+    <text x="472" y="230" font-family="Arial" font-size="12" font-weight="800" fill="#ffd166">logo</text>
+    <text x="400" y="330" font-family="Arial" font-size="18" font-weight="900" fill="#e9e5ef" text-anchor="middle">Original clean MP4 — as Pinterest serves it</text>
+    <text x="400" y="356" font-family="Arial" font-size="13" fill="#7dffc4" text-anchor="middle">✓ No re-encode · ✓ No watermark · ✓ No logo stamp</text>
+  </g>
+</svg>

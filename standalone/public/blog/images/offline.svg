@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d1b2a"/>
+      <stop offset=".6" stop-color="#1b2838"/>
+      <stop offset="1" stop-color="#0f2035"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="16" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="800" height="450" fill="url(#bg)"/>
+  <circle cx="690" cy="80" r="150" fill="#6c5ce7" opacity=".12"/>
+  <circle cx="110" cy="390" r="150" fill="#00d4ff" opacity=".1"/>
+  <g filter="url(#glow)">
+    <path d="M380 100 a86 66 0 0 1 72 40 q26 -6 40 12 q18 22 -6 36 h-70 a28 20 0 0 0 8 16 q6 8 -8 12 a20 16 0 0 1 -22 -14 a36 30 0 0 1 -44 -14 l-2 2 a50 38 0 0 1 -74 -6 a46 42 0 0 1 22 -74 z" fill="#00d4ff" opacity=".18" stroke="#00d4ff" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M400 286 v-46 m-14 20 14 -14 14 14" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="352" y="292" width="96" height="14" rx="7" fill="#fff" opacity=".9"/>
+    <text x="400" y="360" font-family="Arial" font-size="18" font-weight="900" fill="#e9e5ef" text-anchor="middle">Download once. Watch anywhere.</text>
+    <text x="400" y="386" font-family="Arial" font-size="13" fill="#7fb4d8" text-anchor="middle">Plane · Cafe · Trail · No wifi needed</text>
+  </g>
+</svg>

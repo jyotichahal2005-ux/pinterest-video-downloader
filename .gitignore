@@ -1,49 +1,52 @@
-# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+# --- Dependencies ---
+node_modules/
+.pnp
+.pnp.js
 
-# compiled output
-dist
-tmp
-out-tsc
+# --- Build output ---
+dist/
+build/
+out/
+tmp/
+coverage/
 *.tsbuildinfo
-.expo
-.expo-shared
 
-# dependencies
-node_modules
+# --- Environment & secrets ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+standalone/data/admin.json
 
-# IDEs and editors
-/.idea
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
+# --- Logs ---
+*.log
+server.log*
 
-# IDE - VSCode
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.idea/
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+*.sublime-workspace
 
-# misc
-/.sass-cache
-/connect.lock
-/coverage
-/libpeerconnection.log
-npm-debug.log
-yarn-error.log
-testem.log
-/typings
-
-# System Files
-.DS_Store
-Thumbs.db
-
-.cursor/rules/nx-rules.mdc
-.github/instructions/nx.instructions.md
-
-# Replit
+# --- Cache / misc ---
 .cache/
 .local/
+.sass-cache
+libpeerconnection.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- Local agent / conversation data ---
+.agents/
+.conversation/
+
+# --- Pasted attachments (prompts) ---
+attached_assets/*.txt
+

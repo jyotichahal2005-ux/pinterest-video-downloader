@@ -11,20 +11,20 @@ import {
   Link2,
   LoaderCircle,
   LockKeyhole,
-  Menu,
   Play,
   RefreshCcw,
   ShieldCheck,
   Sparkles,
-  X,
   XCircle,
   Zap,
 } from 'lucide-react';
 import { useDownloadPinterestVideo } from '@workspace/api-client-react';
 import { ErrorBoundary } from '@/components/error-boundary';
+import { Seo, SiteFooter, SiteHeader } from '@/components/site-chrome';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
+import { AboutPage, ArticlePage, BlogPage, ContactPage, FaqPage, FeaturesPage, HowItWorksPage, LegalPage } from '@/pages/site-pages';
 import { Route, Switch, Router as WouterRouter, useLocation } from 'wouter';
 
 const queryClient = new QueryClient();
@@ -55,61 +55,6 @@ function PinterestMark({ compact = false }: { compact?: boolean }) {
         </span>
       )}
     </div>
-  );
-}
-
-function Header() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const closeMenu = () => setMenuOpen(false);
-  return (
-    <header className="relative z-20 border-b border-white/[0.07] bg-[#090910]/75 backdrop-blur-xl">
-      <div className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between px-5 sm:px-8">
-        <a href="#top" className="focus-ring" onClick={closeMenu} data-testid="link-brand">
-          <PinterestMark />
-        </a>
-        <nav className="hidden items-center gap-1 md:flex" aria-label="Main navigation">
-          {[
-            ['Downloader', '#top'],
-            ['Features', '#features'],
-            ['How It Works', '#how-it-works'],
-            ['FAQ', '#faq'],
-          ].map(([label, href], index) => (
-            <a
-              key={label}
-              href={href}
-              className={`focus-ring rounded-xl px-4 py-2.5 text-[0.78rem] font-semibold transition-colors ${index === 0 ? 'bg-white/[0.075] text-white' : 'text-[#9795a8] hover:bg-white/[0.05] hover:text-white'}`}
-              data-testid={`link-nav-${label.toLowerCase().replace(/\s+/g, '-')}`}
-            >
-              {label}
-            </a>
-          ))}
-        </nav>
-        <button
-          type="button"
-          className="focus-ring grid size-10 place-items-center rounded-xl border border-white/10 text-[#d8d4e1] md:hidden"
-          onClick={() => setMenuOpen((open) => !open)}
-          aria-expanded={menuOpen}
-          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-          data-testid="button-mobile-menu"
-        >
-          {menuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
-        </button>
-      </div>
-      {menuOpen && (
-        <nav className="mx-5 mb-4 grid gap-1 rounded-2xl border border-white/10 bg-[#12121d] p-2 md:hidden" aria-label="Mobile navigation">
-          {[
-            ['Downloader', '#top'],
-            ['Features', '#features'],
-            ['How It Works', '#how-it-works'],
-            ['FAQ', '#faq'],
-          ].map(([label, href]) => (
-            <a key={label} href={href} onClick={closeMenu} className="focus-ring rounded-xl px-4 py-3 text-sm font-semibold text-[#b8b5c7] hover:bg-white/[0.06] hover:text-white" data-testid={`link-mobile-${label.toLowerCase().replace(/\s+/g, '-')}`}>
-              {label}
-            </a>
-          ))}
-        </nav>
-      )}
-    </header>
   );
 }
 
@@ -279,7 +224,7 @@ function Home() {
 
   return (
     <main id="top" className="site-shell min-h-[100dvh] overflow-hidden text-white">
-      <Header />
+      <SiteHeader />
       <section className="hero-grid relative isolate">
         <div className="hero-glow pointer-events-none absolute -left-56 top-0 -z-10 h-[38rem] w-[42rem] rounded-full" aria-hidden="true" />
         <div className="hero-glow hero-glow-right pointer-events-none absolute -right-48 top-20 -z-10 size-[34rem] rounded-full" aria-hidden="true" />
@@ -297,9 +242,9 @@ function Home() {
               Fast, secure and completely free, right in your browser.
             </p>
 
-            <form onSubmit={handleSubmit} className="download-card animate-rise-in mx-auto mt-10 max-w-2xl p-3 [animation-delay:200ms]" data-testid="form-download">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <div className="flex min-w-0 flex-1 items-center gap-3 rounded-xl border border-white/10 bg-[#0c0c15]/80 px-4 py-3.5 text-left">
+            <form onSubmit={handleSubmit} className="download-card animate-rise-in mx-auto mt-8 max-w-xl p-2.5 [animation-delay:200ms]" data-testid="form-download">
+              <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center">
+                <div className="flex min-w-0 flex-1 items-center gap-3 rounded-xl border border-white/10 bg-[#0c0c15]/80 px-3.5 py-2.5 text-left">
                   <Link2 className="size-[18px] shrink-0 text-[#8d879d]" />
                   <label htmlFor="pinterest-url" className="sr-only">Pinterest video link</label>
                   <input
@@ -317,13 +262,13 @@ function Home() {
                     <span>{copied ? 'Pasted' : 'Paste'}</span>
                   </button>
                 </div>
-                <button type="submit" disabled={isBusy || !url.trim()} className="focus-ring inline-flex min-h-[3.4rem] items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#ef2856] via-[#f9356b] to-[#a93fdb] px-6 text-sm font-bold text-white shadow-[0_8px_28px_rgba(239,40,86,0.25)] transition-transform hover:-translate-y-0.5 hover:shadow-[0_12px_34px_rgba(239,40,86,0.38)] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0" data-testid="button-download">
+                <button type="submit" disabled={isBusy || !url.trim()} className="focus-ring inline-flex min-h-[2.9rem] items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#ef2856] via-[#f9356b] to-[#a93fdb] px-5 text-sm font-bold text-white shadow-[0_8px_28px_rgba(239,40,86,0.25)] transition-transform hover:-translate-y-0.5 hover:shadow-[0_12px_34px_rgba(239,40,86,0.38)] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0" data-testid="button-download">
                   {isBusy ? <LoaderCircle className="size-4 animate-spin" /> : <Download className="size-4" />}
                   {isBusy ? 'Finding video...' : 'Download'}
                 </button>
               </div>
-              <p className="mt-3 flex items-center justify-center gap-1.5 text-[11px] text-[#837f91]"><ShieldCheck className="size-3.5 text-[#54dfa0]" /> Paste a link or try an example: <span className="text-[#cf6a89] underline decoration-[#cf6a89]/40 underline-offset-2">pinterest.com/pin/12345</span></p>
-              <div className="mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-white/[0.08] pt-4 text-[11px] text-[#8a8697]">
+              <p className="mt-3 flex items-center justify-center gap-1.5 text-[11px] text-[#837f91]"><ShieldCheck className="size-3.5 text-[#54dfa0]" /> Paste any public pin link — pinterest.com/pin/... or pin.it/...</p>
+              <div className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 border-t border-white/[0.08] pt-3 text-[11px] text-[#8a8697]">
                 <span className="flex items-center gap-1.5"><LockKeyhole className="size-3.5 text-[#54dfa0]" /> No login required</span>
                 <span className="flex items-center gap-1.5"><Check className="size-3.5 text-[#54dfa0]" /> 100% watermark free</span>
                 <span className="flex items-center gap-1.5"><Zap className="size-3.5 text-[#e990ff]" /> Fast downloads</span>
@@ -386,6 +331,41 @@ function Home() {
         </div>
       </section>
 
+      <section id="about" className="border-t border-white/[0.07] bg-[#0d0d16] py-20 scroll-mt-8 sm:py-28">
+        <div className="mx-auto grid max-w-7xl items-center gap-14 px-5 sm:px-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-24">
+          <div>
+            <p className="section-kicker"><Sparkles className="size-3.5" /> About PinSaver</p>
+            <h2 className="mt-4 font-display text-3xl font-bold tracking-[-0.06em] text-white sm:text-5xl">Built for safe, simple saving.</h2>
+            <p className="mt-5 max-w-md text-base leading-7 text-[#8d899a]">No accounts, no watermarks, no unnecessary steps. Just a direct path to the public Pinterest videos you want to keep.</p>
+            <a href="/about" className="focus-ring mt-8 inline-flex items-center gap-2 text-sm font-semibold text-white transition-colors hover:text-[#ff527d]" data-testid="link-about-page">
+              Learn more about us <ArrowRight className="size-4" />
+            </a>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <article className="content-card p-6">
+              <LockKeyhole className="size-6 text-[#ff537d]" />
+              <h3 className="mt-4 font-display text-lg font-semibold text-white">Privacy first</h3>
+              <p className="mt-2 text-sm leading-6 text-[#8d899a]">No download history, no profiles, no tracking. Your workflow stays yours.</p>
+            </article>
+            <article className="content-card p-6">
+              <ShieldCheck className="size-6 text-[#ff537d]" />
+              <h3 className="mt-4 font-display text-lg font-semibold text-white">Clear boundaries</h3>
+              <p className="mt-2 text-sm leading-6 text-[#8d899a]">Designed for public pins and personal use only. No private-pin bypasses.</p>
+            </article>
+            <article className="content-card p-6">
+              <Zap className="size-6 text-[#ff537d]" />
+              <h3 className="mt-4 font-display text-lg font-semibold text-white">Fast & lightweight</h3>
+              <p className="mt-2 text-sm leading-6 text-[#8d899a]">No bloated features. Just paste, preview, and download in seconds.</p>
+            </article>
+            <article className="content-card p-6">
+              <Check className="size-6 text-[#ff537d]" />
+              <h3 className="mt-4 font-display text-lg font-semibold text-white">Truly free</h3>
+              <p className="mt-2 text-sm leading-6 text-[#8d899a]">No subscriptions, no hidden fees. Completely free to use.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
       <section id="faq" className="border-t border-white/[0.07] bg-[#0d0d16] py-20 scroll-mt-8 sm:py-28">
         <div className="mx-auto grid max-w-7xl gap-12 px-5 sm:px-8 lg:grid-cols-[0.7fr_1.3fr] lg:gap-24">
           <div>
@@ -410,13 +390,7 @@ function Home() {
         </div>
       </section>
 
-      <footer className="border-t border-white/[0.07] bg-[#090910]">
-        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-          <PinterestMark />
-          <p className="text-xs text-[#6f6b7b]">Built for the links worth keeping.</p>
-          <a href="#top" className="focus-ring inline-flex items-center gap-2 text-xs font-semibold text-[#9d98aa] transition-colors hover:text-white" data-testid="link-footer-top">Back to top <ArrowDown className="size-3.5 rotate-180" /></a>
-        </div>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }
@@ -424,8 +398,18 @@ function Home() {
 function Router() {
   return (
     <RoutedErrorBoundary>
+      <Seo />
       <Switch>
         <Route path="/" component={Home} />
+        <Route path="/features" component={FeaturesPage} />
+        <Route path="/how-it-works" component={HowItWorksPage} />
+        <Route path="/blog" component={BlogPage} />
+        <Route path="/blog/:slug" component={({ params }) => <ArticlePage slug={params.slug as string} />} />
+        <Route path="/about" component={AboutPage} />
+        <Route path="/faq" component={FaqPage} />
+        <Route path="/contact" component={ContactPage} />
+        <Route path="/privacy" component={() => <LegalPage kind="privacy" />} />
+        <Route path="/terms" component={() => <LegalPage kind="terms" />} />
         <Route component={NotFound} />
       </Switch>
     </RoutedErrorBoundary>

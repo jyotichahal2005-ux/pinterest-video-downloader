@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+# Allow blog post images and all public pages
+Allow: /blog/images/
+
+Sitemap: https://pinsaver.app/sitemap.xml

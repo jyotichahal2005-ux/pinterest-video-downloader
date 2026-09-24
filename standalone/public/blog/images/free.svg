@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a0525"/>
+      <stop offset=".55" stop-color="#0d1b2a"/>
+      <stop offset="1" stop-color="#0a1628"/>
+    </linearGradient>
+    <linearGradient id="gift" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff2d6b"/>
+      <stop offset="1" stop-color="#c74dff"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="16" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="800" height="450" fill="url(#bg)"/>
+  <circle cx="690" cy="80" r="140" fill="#c74dff" opacity=".12"/>
+  <circle cx="110" cy="390" r="150" fill="#ff2d6b" opacity=".1"/>
+  <g filter="url(#glow)">
+    <rect x="300" y="200" width="200" height="150" rx="16" fill="#181833" stroke="#3a3a5c" stroke-width="5"/>
+    <rect x="300" y="250" width="200" height="100" rx="0" fill="#1d1d3f"/>
+    <path d="M380 250 v100 M420 250 v100" stroke="#3a3a5c" stroke-width="5"/>
+    <path d="M300 250 h200" stroke="#3a3a5c" stroke-width="5"/>
+    <path d="M380 200 l10 -34 q8 -14 26 -6 q18 8 4 22 l-30 28 M420 200 l-10 -34 q-8 -14 -26 -6 q-18 8 -4 22 l30 28" fill="#ffd166" stroke="#ffd166" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="400" cy="226" r="10" fill="#ff2d6b"/>
+    <text x="400" y="334" font-family="Arial" font-size="54" font-weight="900" fill="#fff" text-anchor="middle">FREE</text>
+    <text x="400" y="368" font-family="Arial" font-size="15" font-weight="700" fill="#00e896" text-anchor="middle">No sign-up · No login · No limits</text>
+  </g>
+  <g filter="url(#glow)">
+    <circle cx="585" cy="110" r="44" fill="none" stroke="#00e896" stroke-width="6"/>
+    <text x="585" y="106" font-family="Arial" font-size="26" font-weight="900" fill="#7dffc4" text-anchor="middle">✓</text>
+    <text x="585" y="132" font-family="Arial" font-size="11" font-weight="800" fill="#00e896" text-anchor="middle">100% free</text>
+    <text x="215" cy="0" font-family="Arial" font-size="0"/>
+  </g>
+</svg>
