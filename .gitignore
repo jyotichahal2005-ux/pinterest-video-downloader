@@ -12,9 +12,9 @@ coverage/
 *.tsbuildinfo
 
 # --- Environment & secrets ---
-.env
-.env.*
-!.env.example
+**/.env
+**/.env.*
+!**/.env.example
 *.pem
 *.key
 standalone/data/admin.json
