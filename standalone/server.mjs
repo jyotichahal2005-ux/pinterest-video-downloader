@@ -4,6 +4,17 @@ import path from "node:path";
 import zlib from "node:zlib";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
+import {
+  DEFAULT_SETTINGS,
+  createBlogPost,
+  deleteBlogPost,
+  getAdminCredentials,
+  getBlogPosts,
+  getSiteSettings,
+  updateBlogPost,
+  upsertAdminCredentials,
+  upsertSiteSettings,
+} from "./supabase-store.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.join(__dirname, "public");
@@ -43,66 +54,30 @@ const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "";
 
 // --------------------------- Site settings (config) ---------------------------
 
-const SETTINGS_DATA_FILE = path.join(__dirname, "data", "settings.json");
-const ADMIN_DATA_FILE = path.join(__dirname, "data", "admin.json");
-
-const DEFAULT_SETTINGS = {
-  siteTitle: "PinSaver",
-  defaultMetaDescription: "",
-  defaultOgImage: "",
-  gaId: "",
-  gscVerifyTag: "",
-  instagram: "",
-  twitter: "",
-  youtube: "",
-  facebook: "",
-  supportEmail: "",
-  supportPhone: "",
-};
-
-function loadSettings() {
-  try {
-    const data = JSON.parse(fs.readFileSync(SETTINGS_DATA_FILE, "utf8"));
-    if (data && typeof data === "object") {
-      return { ...DEFAULT_SETTINGS, ...data };
-    }
-  } catch {
-    /* missing/invalid file -> defaults */
-  }
-  return { ...DEFAULT_SETTINGS };
+async function loadSettings() {
+  return getSiteSettings();
 }
 
-function saveSettings(settings) {
-  fs.mkdirSync(path.dirname(SETTINGS_DATA_FILE), { recursive: true });
-  const clean = {};
-  for (const key of Object.keys(DEFAULT_SETTINGS)) {
-    clean[key] = typeof settings?.[key] === "string" ? settings[key] : "";
-  }
-  fs.writeFileSync(SETTINGS_DATA_FILE, JSON.stringify(clean, null, 2), "utf8");
-  return clean;
+async function saveSettings(settings) {
+  return upsertSiteSettings(settings);
 }
 
 // --------------------------- Admin credentials (hashed) ---------------------------
 
-function loadAdminRecord() {
-  try {
-    return JSON.parse(fs.readFileSync(ADMIN_DATA_FILE, "utf8"));
-  } catch {
-    return null;
-  }
+async function loadAdminRecord() {
+  return getAdminCredentials();
 }
 
-function saveAdminRecord(record) {
-  fs.mkdirSync(path.dirname(ADMIN_DATA_FILE), { recursive: true });
-  fs.writeFileSync(ADMIN_DATA_FILE, JSON.stringify(record, null, 2), "utf8");
+async function saveAdminRecord(record) {
+  return upsertAdminCredentials(record);
 }
 
 function hashPassword(password, salt) {
   return crypto.scryptSync(String(password), salt, 64).toString("hex");
 }
 
-function adminPasswordMatches(password) {
-  const rec = loadAdminRecord();
+async function adminPasswordMatches(password) {
+  const rec = await loadAdminRecord();
   if (rec && rec.hash && rec.salt) {
     const a = hashPassword(password, rec.salt);
     const b = String(rec.hash);
@@ -111,12 +86,13 @@ function adminPasswordMatches(password) {
   return String(password || "") === ADMIN_PASSWORD;
 }
 
-function adminConfigured() {
-  return !!(ADMIN_PASSWORD || adminPasswordMatchesEnabled());
+async function adminConfigured() {
+  if (ADMIN_PASSWORD) return true;
+  return adminPasswordMatchesEnabled();
 }
 
-function adminPasswordMatchesEnabled() {
-  const rec = loadAdminRecord();
+async function adminPasswordMatchesEnabled() {
+  const rec = await loadAdminRecord();
   return !!(rec && rec.hash && rec.salt);
 }
 
@@ -148,12 +124,12 @@ function aiBaseUrl() {
   return "https://api.openai.com/v1";
 }
 
-function aiStatus() {
+async function aiStatus() {
   return {
     configured: Boolean(AI_KEY),
     provider: aiProvider(),
     model: aiModel(),
-    adminAuth: adminConfigured(),
+    adminAuth: await adminConfigured(),
   };
 }
 
@@ -373,15 +349,14 @@ function extractJson(text) {
   }
 }
 
-function adminAuthed(req) {
-  if (!adminConfigured()) return true;
+async function adminAuthed(req) {
   return (req.headers.cookie || "").includes("pinsaver_admin=1");
 }
 
 // ---------- Inject site settings into served HTML ----------
 
-function applySiteSettings(html, isContactPage) {
-  const s = loadSettings();
+async function applySiteSettings(html, isContactPage) {
+  const s = await loadSettings();
   let out = String(html);
 
   if (s.siteTitle && s.siteTitle.trim() && s.siteTitle !== "PinSaver") {
@@ -611,18 +586,8 @@ async function downloadPinterestVideo(rawUrl) {
 
 // -------------------------------- Blog CMS ---------------------------------
 
-const BLOG_DATA_FILE = path.join(__dirname, "data", "blog-posts.json");
-
-function loadBlogPosts() {
-  try {
-    return JSON.parse(fs.readFileSync(BLOG_DATA_FILE, "utf8"));
-  } catch {
-    return [];
-  }
-}
-
-function saveBlogPosts(posts) {
-  fs.writeFileSync(BLOG_DATA_FILE, JSON.stringify(posts, null, 2), "utf8");
+async function loadBlogPosts() {
+  return getBlogPosts();
 }
 
 function getPostById(posts, id) {
@@ -1067,7 +1032,7 @@ function sendJson(res, status, body) {
   res.end(data);
 }
 
-function sendFile(res, filePath, req) {
+async function sendFile(res, filePath, req) {
   const ext = path.extname(filePath).toLowerCase();
   const type = MIME[ext] || "application/octet-stream";
   let data;
@@ -1080,7 +1045,7 @@ function sendFile(res, filePath, req) {
 
   if (ext === ".html") {
     const isContact = path.basename(filePath).toLowerCase() === "contact.html";
-    data = Buffer.from(applySiteSettings(data.toString("utf8"), isContact), "utf8");
+    data = Buffer.from(await applySiteSettings(data.toString("utf8"), isContact), "utf8");
   }
 
   // Cache-Control: HTML fresh; versioned JS/CSS long-lived; other assets daily
@@ -1106,7 +1071,7 @@ function sendFile(res, filePath, req) {
   res.end(body);
 }
 
-const server = http.createServer(async (req, res) => {
+async function handleRequest(req, res) {
   const method = req.method;
   const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
 
@@ -1139,7 +1104,7 @@ const server = http.createServer(async (req, res) => {
       ["/pinterest-video-downloader-no-watermark", "0.7", "monthly", "2026-01-22"],
       ["/best-pinterest-video-downloader-2026", "0.6", "monthly", "2026-01-26"],
     ];
-    const published = loadBlogPosts().filter((p) => p.status === "published");
+    const published = (await loadBlogPosts()).filter((p) => p.status === "published");
     let staticPostSlugs = [];
     try {
       staticPostSlugs = fs
@@ -1280,7 +1245,7 @@ ${urls.join("\n")}
 
   // ---------- AI Assistant ----------
   if (url.pathname === "/api/ai/status") {
-    sendJson(res, 200, aiStatus());
+    sendJson(res, 200, await aiStatus());
     return;
   }
 
@@ -1309,7 +1274,7 @@ ${urls.join("\n")}
   if (url.pathname === "/admin" || url.pathname === "/admin/") {
     const adminPath = path.join(PUBLIC_DIR, "admin.html");
     try {
-      sendFile(res, adminPath, req);
+      await sendFile(res, adminPath, req);
     } catch {
       sendJson(res, 404, { error: "Admin page not found." });
     }
@@ -1318,16 +1283,16 @@ ${urls.join("\n")}
 
   // Public site settings (used by layout.js / footer to render social + contact)
   if (url.pathname === "/api/site/settings" && method === "GET") {
-    sendJson(res, 200, loadSettings());
+    sendJson(res, 200, await loadSettings());
     return;
   }
 
   // ---------- Admin session auth (optional) ----------
-  if (adminConfigured()) {
+  if (await adminConfigured()) {
     if (url.pathname === "/api/admin/login" && method === "POST") {
       const input = await readJsonBody(req);
       const usernameOk = !ADMIN_USERNAME || String(input?.username || "") === ADMIN_USERNAME;
-      const passwordOk = adminPasswordMatches(input?.password);
+      const passwordOk = await adminPasswordMatches(input?.password);
       const ok = usernameOk && passwordOk;
       if (ok) {
         res.writeHead(200, {
@@ -1355,7 +1320,7 @@ ${urls.join("\n")}
       url.pathname === "/api/posts" ||
       /^\/api\/posts\//.test(url.pathname) ||
       url.pathname.startsWith("/api/admin/");
-    if (adminProtected && !adminAuthed(req)) {
+    if (adminProtected && !(await adminAuthed(req))) {
       sendJson(res, 401, { error: "Admin login required." });
       return;
     }
@@ -1363,7 +1328,7 @@ ${urls.join("\n")}
 
   // ---------- Admin settings API ----------
   if (url.pathname === "/api/admin/settings" && method === "GET") {
-    sendJson(res, 200, loadSettings());
+    sendJson(res, 200, await loadSettings());
     return;
   }
 
@@ -1380,8 +1345,8 @@ ${urls.join("\n")}
       else if (key === "gscVerifyTag") clean[key] = value.slice(0, 2000);
       else clean[key] = value.slice(0, 500);
     }
-    saveSettings(clean);
-    sendJson(res, 200, { ok: true, settings: loadSettings() });
+    const savedSettings = await saveSettings(clean);
+    sendJson(res, 200, { ok: true, settings: savedSettings });
     return;
   }
 
@@ -1394,7 +1359,7 @@ ${urls.join("\n")}
     const current = String(input.currentPassword || "");
     const next = String(input.newPassword || "");
     const confirm = String(input.confirmPassword || "");
-    if (!adminPasswordMatches(current)) {
+    if (!(await adminPasswordMatches(current))) {
       sendJson(res, 401, { error: "Current password is incorrect." });
       return;
     }
@@ -1407,7 +1372,7 @@ ${urls.join("\n")}
       return;
     }
     const salt = crypto.randomBytes(16).toString("hex");
-    saveAdminRecord({ salt, hash: hashPassword(next, salt), updatedAt: new Date().toISOString() });
+    await saveAdminRecord({ salt, hash: hashPassword(next, salt), updatedAt: new Date().toISOString() });
     sendJson(res, 200, { ok: true });
     return;
   }
@@ -1415,7 +1380,7 @@ ${urls.join("\n")}
   // ---------- Blog post CMS API ----------
   if (url.pathname === "/api/posts" && method === "GET") {
     const status = url.searchParams.get("status");
-    const posts = loadBlogPosts();
+    const posts = await loadBlogPosts();
     const result = status ? posts.filter((p) => p.status === status) : posts;
     sendJson(res, 200, result);
     return;
@@ -1427,7 +1392,7 @@ ${urls.join("\n")}
       sendJson(res, 400, { error: "Invalid JSON body." });
       return;
     }
-    const posts = loadBlogPosts();
+    const posts = await loadBlogPosts();
     const rawSlug = slugify(input.slug || input.title);
     const now = new Date().toISOString();
     const post = {
@@ -1452,16 +1417,15 @@ ${urls.join("\n")}
       createdAt: now,
       updatedAt: now,
     };
-    posts.push(post);
-    saveBlogPosts(posts);
-    sendJson(res, 201, post);
+    const savedPost = await createBlogPost(post);
+    sendJson(res, 201, savedPost);
     return;
   }
 
   const postMatch = url.pathname.match(/^\/api\/posts\/([\w-]+)$/);
   if (postMatch) {
     const id = postMatch[1];
-    const posts = loadBlogPosts();
+    const posts = await loadBlogPosts();
     const index = posts.findIndex((p) => p.id === id);
 
     if (method === "GET") {
@@ -1494,8 +1458,8 @@ ${urls.join("\n")}
         readTime: readTimeFor(input.content ?? existing.content),
         updatedAt: new Date().toISOString(),
       };
-      saveBlogPosts(posts);
-      sendJson(res, 200, posts[index]);
+      const savedPost = await updateBlogPost(posts[index]);
+      sendJson(res, 200, savedPost);
       return;
     }
 
@@ -1505,7 +1469,7 @@ ${urls.join("\n")}
         return;
       }
       const [removed] = posts.splice(index, 1);
-      saveBlogPosts(posts);
+      await deleteBlogPost(removed.id);
       sendJson(res, 200, removed);
       return;
     }
@@ -1546,9 +1510,10 @@ ${urls.join("\n")}
     } catch {
       slug = blogPage[1];
     }
-    const post = getPostBySlug(loadBlogPosts(), slug);
+    const posts = await loadBlogPosts();
+    const post = getPostBySlug(posts, slug);
     if (post && post.status === "published") {
-      const pageHtml = applySiteSettings(renderBlogPostPage(post, pickRelated(loadBlogPosts(), slug)), false);
+      const pageHtml = await applySiteSettings(renderBlogPostPage(post, pickRelated(posts, slug)), false);
       res.writeHead(200, {
         "Content-Type": "text/html; charset=utf-8",
         "Content-Length": Buffer.byteLength(pageHtml),
@@ -1561,11 +1526,27 @@ ${urls.join("\n")}
   // Static files
   const filePath = resolvePublicPath(url.pathname === "/" ? "/" : url.pathname);
   if (filePath) {
-    sendFile(res, filePath, req);
+    await sendFile(res, filePath, req);
     return;
   }
 
   sendJson(res, 404, { error: "Not found" });
+}
+
+const server = http.createServer((req, res) => {
+  handleRequest(req, res).catch((error) => {
+    if (res.headersSent) {
+      res.end();
+      return;
+    }
+    const status = Number.isInteger(error.status) && error.status >= 400 && error.status < 500
+      ? error.status
+      : 503;
+    const message = status === 503
+      ? "Storage service unavailable."
+      : (error.message || "Request failed.");
+    sendJson(res, status, { error: message });
+  });
 });
 
 server.listen(PORT, "0.0.0.0", () => {
