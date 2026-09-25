@@ -158,7 +158,7 @@ function aiStatus() {
 }
 
 const SITE_CONTEXT = [
-  "You write SEO blog articles for PinSaver (pinsaver.app), a free online Pinterest video downloader tool.",
+  "You write SEO blog articles for PinSaver (https://pinterest-video-downloader-69a6.onrender.com), a free online Pinterest video downloader tool.",
   "The tool lets visitors paste a public Pinterest pin URL and get direct MP4 download links.",
   "Articles are practical, helpful guides â€” no fluff, no fake promises, no exaggeration.",
   "Always write in clear, simple, natural English.",
@@ -204,7 +204,7 @@ function buildAiRequest(action, input) {
         "- Mention PinSaver naturally 2-3 times and tell readers where to paste their Pinterest link. Do not invent URLs or features; only refer to the tool by name and its ability to extract MP4 links from public pins.",
         "- End with a short 'Frequently asked questions' H2 section with 3-4 Q&A items.",
         "- Do NOT include a plain 'Conclusion' section.",
-        "- Use markdown links like [PinSaver](https://pinsaver.app) at most 2 times.",
+        "- Use markdown links like [PinSaver](https://pinterest-video-downloader-69a6.onrender.com) at most 2 times.",
       ].filter(Boolean).join("\n");
       return { system: SITE_CONTEXT, user };
     }
@@ -875,8 +875,8 @@ function renderBlogPostPage(post, relatedPosts) {
     "datePublished": ${JSON.stringify(dateIso)},
     "dateModified": ${JSON.stringify(post.updatedAt ? new Date(post.updatedAt).toISOString().slice(0, 10) : dateIso)},
     "author": { "@type": "Person", "name": ${JSON.stringify(post.author || "PinSaver Team")} },
-    "publisher": { "@type": "Organization", "name": "PinSaver", "logo": { "@type": "ImageObject", "url": "https://pinsaver.app/favicon.svg" } },
-    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://pinsaver.app/blog/${encodeURIComponent(post.slug)}" },
+    "publisher": { "@type": "Organization", "name": "PinSaver", "logo": { "@type": "ImageObject", "url": "https://pinterest-video-downloader-69a6.onrender.com/favicon.svg" } },
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://pinterest-video-downloader-69a6.onrender.com/blog/${encodeURIComponent(post.slug)}" },
     "articleSection": ${JSON.stringify(post.category || "Guide")},
     "inLanguage": "en"
   }`;
@@ -890,16 +890,16 @@ function renderBlogPostPage(post, relatedPosts) {
   <title>${escapeHtml(pageTitle)}</title>
   <meta name="description" content="${escapeHtml(pageDescription)}" />
   <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://pinsaver.app/blog/${encodeURIComponent(post.slug)}" />
+  <link rel="canonical" href="https://pinterest-video-downloader-69a6.onrender.com/blog/${encodeURIComponent(post.slug)}" />
   <meta property="og:title" content="${escapeHtml(pageTitle)}" />
   <meta property="og:description" content="${escapeHtml(pageDescription)}" />
   <meta property="og:type" content="article" />
-  <meta property="og:url" content="https://pinsaver.app/blog/${encodeURIComponent(post.slug)}" />
-  <meta property="og:image" content="https://pinsaver.app/img/og-image.png?v=2" />
+  <meta property="og:url" content="https://pinterest-video-downloader-69a6.onrender.com/blog/${encodeURIComponent(post.slug)}" />
+  <meta property="og:image" content="https://pinterest-video-downloader-69a6.onrender.com/img/og-image.png?v=2" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:image" content="https://pinsaver.app/img/og-image.png?v=2" />
+  <meta name="twitter:image" content="https://pinterest-video-downloader-69a6.onrender.com/img/og-image.png?v=2" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="apple-touch-icon" href="/img/apple-touch-icon.png" />
   <link rel="stylesheet" href="/css/style.css?v=13" />${faqSchema}
@@ -1162,7 +1162,7 @@ const server = http.createServer(async (req, res) => {
     let urls = staticPages
       .map(
         ([loc, pri, freq, last]) => `  <url>
-    <loc>https://pinsaver.app${loc}</loc>
+    <loc>https://pinterest-video-downloader-69a6.onrender.com${loc}</loc>
     ${last ? `    <lastmod>${last}</lastmod>\n` : ""}    <changefreq>${freq}</changefreq>
     <priority>${pri}</priority>
   </url>`
@@ -1171,7 +1171,7 @@ const server = http.createServer(async (req, res) => {
         staticPostSlugs.map((slug) => {
           const last = staticPostDates[slug] || "";
           return `  <url>
-    <loc>https://pinsaver.app/blog/${encodeURIComponent(slug)}</loc>
+    <loc>https://pinterest-video-downloader-69a6.onrender.com/blog/${encodeURIComponent(slug)}</loc>
     ${last ? `    <lastmod>${last}</lastmod>\n` : ""}    <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>`;
@@ -1181,7 +1181,7 @@ const server = http.createServer(async (req, res) => {
         published.map((p) => {
           const last = p.updatedAt ? new Date(p.updatedAt).toISOString().slice(0, 10) : (p.createdAt ? new Date(p.createdAt).toISOString().slice(0, 10) : "");
           return `  <url>
-    <loc>https://pinsaver.app/blog/${encodeURIComponent(p.slug)}</loc>
+    <loc>https://pinterest-video-downloader-69a6.onrender.com/blog/${encodeURIComponent(p.slug)}</loc>
     ${last ? `    <lastmod>${last}</lastmod>\n` : ""}    <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>`;

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { resolveMeta } from '@/pages/site-pages';
 
-const SITE_URL = 'https://pinsaver.app';
+const SITE_URL = 'https://pinterest-video-downloader-69a6.onrender.com';
 
 export function Seo() {
   const [location] = useLocation();

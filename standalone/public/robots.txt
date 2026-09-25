@@ -6,4 +6,4 @@ Disallow: /api/
 # Allow blog post images and all public pages
 Allow: /blog/images/
 
-Sitemap: https://pinsaver.app/sitemap.xml
+Sitemap: https://pinterest-video-downloader-69a6.onrender.com/sitemap.xml
