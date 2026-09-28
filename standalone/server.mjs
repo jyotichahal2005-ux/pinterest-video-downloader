@@ -136,7 +136,7 @@ async function aiStatus() {
 const SITE_CONTEXT = [
   "You write SEO blog articles for PinSaver (https://pinterest-video-downloader-69a6.onrender.com), a free online Pinterest video downloader tool.",
   "The tool lets visitors paste a public Pinterest pin URL and get direct MP4 download links.",
-  "Articles are practical, helpful guides â€” no fluff, no fake promises, no exaggeration.",
+  "Articles are practical, helpful guides — no fluff, no fake promises, no exaggeration.",
   "Always write in clear, simple, natural English.",
 ].join("\n");
 
@@ -355,7 +355,7 @@ async function adminAuthed(req) {
 
 // ---------- Inject site settings into served HTML ----------
 
-async function applySiteSettings(html, isContactPage) {
+async function applySiteSettings(html, isContactPage, isAdminPage) {
   const s = await loadSettings();
   let out = String(html);
 
@@ -374,7 +374,7 @@ async function applySiteSettings(html, isContactPage) {
     out = out.replace(/https:\/\/pinsaver\.app\/img\/og-image\.png\?v=2/g, escapeHtml(s.defaultOgImage.trim()));
   }
 
-  if (s.gaId) {
+  if (s.gaId && !isAdminPage) {
     out = out.replace(
       /<\/head>/,
       `  <script async src="https://www.googletagmanager.com/gtag/js?id=${escapeHtml(s.gaId.trim())}"></script>
@@ -877,7 +877,7 @@ function renderBlogPostPage(post, relatedPosts) {
 
   <main>
     <article class="prose" style="max-width:46rem;">
-      <a class="back-link" href="/blog">â† Back to field notes</a>
+      <a class="back-link" href="/blog">← Back to field notes</a>
       <span class="section-kicker" style="margin-top:2rem;display:inline-flex;">${escapeHtml(post.category || "Guide")}</span>
       <h1 style="font-size:clamp(2.2rem,5.5vw,3.6rem);letter-spacing:-0.05em;line-height:1.05;margin-top:.8rem;">${escapeHtml(post.title)}</h1>
       <div class="card-foot" style="margin-top:1rem;">
@@ -1044,8 +1044,10 @@ async function sendFile(res, filePath, req) {
   }
 
   if (ext === ".html") {
-    const isContact = path.basename(filePath).toLowerCase() === "contact.html";
-    data = Buffer.from(await applySiteSettings(data.toString("utf8"), isContact), "utf8");
+    const base = path.basename(filePath).toLowerCase();
+    const isContact = base === "contact.html";
+    const isAdmin = base === "admin.html";
+    data = Buffer.from(await applySiteSettings(data.toString("utf8"), isContact, isAdmin), "utf8");
   }
 
   // Cache-Control: HTML fresh; versioned JS/CSS long-lived; other assets daily
@@ -1195,7 +1197,7 @@ ${urls.join("\n")}
     return;
   }
 
-  // File download proxy â€” makes the browser save the file instead of playing it
+  // File download proxy — makes the browser save the file instead of playing it
   if (url.pathname === "/api/file" && method === "GET") {
     const target = url.searchParams.get("url");
     const rawName = url.searchParams.get("name") || "pinterest-video.mp4";

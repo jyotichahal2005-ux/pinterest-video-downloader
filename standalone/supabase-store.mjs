@@ -2,7 +2,7 @@ const DEFAULT_SETTINGS = {
   siteTitle: "PinSaver",
   defaultMetaDescription: "",
   defaultOgImage: "",
-  gaId: "",
+  gaId: "G-RQM1XHMH52",
   gscVerifyTag: "",
   instagram: "",
   twitter: "",
@@ -143,7 +143,9 @@ function postToRow(post) {
 }
 
 export function normalizeSettings(value) {
-  return { ...DEFAULT_SETTINGS, ...objectValue(value) };
+  const merged = { ...DEFAULT_SETTINGS, ...objectValue(value) };
+  if (!String(merged.gaId || "").trim()) merged.gaId = DEFAULT_SETTINGS.gaId;
+  return merged;
 }
 
 export async function getBlogPosts(status) {
