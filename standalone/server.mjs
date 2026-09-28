@@ -1124,6 +1124,14 @@ async function handleRequest(req, res) {
       "save-pinterest-videos-offline": "2026-08-10",
       "pinterest-video-download-legal": "2026-08-01",
     };
+    const seenSlugs = new Set();
+    const uniquePublished = published.filter((p) => {
+      const slug = String(p.slug || "");
+      if (!slug || seenSlugs.has(slug)) return false;
+      seenSlugs.add(slug);
+      return true;
+    });
+    const uniqueStaticPostSlugs = staticPostSlugs.filter((slug) => !seenSlugs.has(slug));
     let urls = staticPages
       .map(
         ([loc, pri, freq, last]) => `  <url>
@@ -1133,7 +1141,7 @@ async function handleRequest(req, res) {
   </url>`
       )
       .concat(
-        staticPostSlugs.map((slug) => {
+        uniqueStaticPostSlugs.map((slug) => {
           const last = staticPostDates[slug] || "";
           return `  <url>
     <loc>https://pinterest-video-downloader-69a6.onrender.com/blog/${encodeURIComponent(slug)}</loc>
@@ -1143,7 +1151,7 @@ async function handleRequest(req, res) {
         })
       )
       .concat(
-        published.map((p) => {
+        uniquePublished.map((p) => {
           const last = p.updatedAt ? new Date(p.updatedAt).toISOString().slice(0, 10) : (p.createdAt ? new Date(p.createdAt).toISOString().slice(0, 10) : "");
           return `  <url>
     <loc>https://pinterest-video-downloader-69a6.onrender.com/blog/${encodeURIComponent(p.slug)}</loc>
