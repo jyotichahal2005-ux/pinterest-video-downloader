@@ -1,0 +1,321 @@
+#!/usr/bin/env node
+/**
+ * One-time OAuth helper for the PinSaver Blogger agent.
+ *
+ * Runs the OAuth 2.0 "authorization code" flow against Google with
+ * access_type=offline + prompt=consent so Google always hands back a
+ * long-lived refresh token. The refresh token is what the CI job uses;
+ * it never expires.
+ *
+ * Usage:
+ *   node scripts/generateRefreshToken.js
+ *   node scripts/generateRefreshToken.js --client-id=... --client-secret=...
+ *
+ * You will need "http://localhost:3000/oauth2callback" registered as an
+ * Authorized redirect URI on the OAuth client in Google Cloud Console.
+ */
+
+import http from 'node:http';
+import { spawn } from 'node:child_process';
+import readline from 'node:readline/promises';
+import { stdin, stdout } from 'node:process';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const PROJECT_ROOT = path.resolve(__dirname, '..');
+const ENV_PATH = path.join(PROJECT_ROOT, '.env');
+
+const SCOPES = [
+  'https://www.googleapis.com/auth/blogger',
+  'https://www.googleapis.com/auth/userinfo.email',
+].join(' ');
+
+const DEFAULT_PORT = 3000;
+const DEFAULT_BLOG_ID = '7265988019810439292';
+const CONSENT_TIMEOUT_MS = 5 * 60 * 1000;
+
+const args = parseArgs(process.argv.slice(2));
+
+const clientId = args['client-id'] || process.env.GOOGLE_CLIENT_ID;
+const clientSecret = args['client-secret'] || process.env.GOOGLE_CLIENT_SECRET;
+const port = Number(args.port || process.env.OAUTH_PORT || DEFAULT_PORT);
+const redirectUri = args['redirect-uri'] || `http://localhost:${port}/oauth2callback`;
+const blogId = args['blog-id'] || process.env.BLOGGER_BLOG_ID || DEFAULT_BLOG_ID;
+
+main().catch((err) => {
+  console.error(`\n[fail] ${err.message}`);
+  process.exit(1);
+});
+
+async function main() {
+  console.log('\n=== PinSaver Blogger agent - OAuth refresh token setup ===\n');
+
+  const resolvedClientId = clientId || (await ask('Google OAuth Client ID: '));
+  const resolvedClientSecret =
+    clientSecret || (await ask('Google OAuth Client Secret: '));
+
+  if (!resolvedClientId || !resolvedClientSecret) {
+    throw new Error('Client ID and Client Secret are both required.');
+  }
+
+  console.log(`\nRedirect URI : ${redirectUri}`);
+  console.log(`Scopes        : ${SCOPES}`);
+  console.log('Blog ID       : ' + blogId);
+  console.log('\nOpening your browser for consent...');
+
+  const code = await waitForAuthCode({ port, redirectUri, clientId: resolvedClientId });
+
+  console.log('\nExchanging auth code for tokens...');
+  const tokens = await exchangeCodeForTokens({
+    code,
+    clientId: resolvedClientId,
+    clientSecret: resolvedClientSecret,
+    redirectUri,
+  });
+
+  if (!tokens.refresh_token) {
+    throw new Error(
+      'Google did not return a refresh_token.\n' +
+        'This usually means consent was already granted for this client, so Google\n' +
+        'skipped the consent screen. Revoke access at\n' +
+        'https://myaccount.google.com/permissions then run this script again.',
+    );
+  }
+
+  console.log('\nVerifying the refresh token against the Blogger API...');
+  const identity = await verifyBloggerAccess({
+    refreshToken: tokens.refresh_token,
+    clientId: resolvedClientId,
+    clientSecret: resolvedClientSecret,
+    blogId,
+  });
+
+  saveToEnvFile({
+    GOOGLE_CLIENT_ID: resolvedClientId,
+    GOOGLE_CLIENT_SECRET: resolvedClientSecret,
+    GOOGLE_REFRESH_TOKEN: tokens.refresh_token,
+    BLOGGER_BLOG_ID: blogId,
+  });
+
+  console.log('\n--- SUCCESS ---------------------------------------------');
+  console.log(`Blog reachable : ${identity.title} (${identity.url})`);
+  console.log(`Signed in as    : ${identity.email || 'unknown (email scope not returned)'}`);
+  console.log('\nPaste this refresh token into the GitHub secret GOOGLE_REFRESH_TOKEN:');
+  console.log('\n' + tokens.refresh_token);
+  console.log('\nIt was also written to ' + ENV_PATH + ' (git-ignored).');
+  console.log('-------------------------------------------------------------\n');
+}
+
+function waitForAuthCode({ port, redirectUri, clientId }) {
+  return new Promise((resolve, reject) => {
+    const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+    authUrl.searchParams.set('client_id', clientId);
+    authUrl.searchParams.set('redirect_uri', redirectUri);
+    authUrl.searchParams.set('response_type', 'code');
+    authUrl.searchParams.set('scope', SCOPES);
+    authUrl.searchParams.set('access_type', 'offline');
+    authUrl.searchParams.set('prompt', 'consent');
+    authUrl.searchParams.set('include_granted_scopes', 'true');
+
+    let settled = false;
+    const finish = (fn, value) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      fn(value);
+    };
+
+    const server = http.createServer((req, res) => {
+      const url = new URL(req.url, redirectUri);
+
+      if (url.pathname !== '/oauth2callback') {
+        res.writeHead(404).end('Not found');
+        return;
+      }
+
+      const error = url.searchParams.get('error');
+      if (error) {
+        const description =
+          url.searchParams.get('error_description') || 'Authorization was denied.';
+        res.writeHead(400, { 'Content-Type': 'text/html' });
+        res.end(`<h1>Authorization failed</h1><p>${escapeHtml(description)}</p>`);
+        finish(reject, new Error(`${error}: ${description}`));
+        return;
+      }
+
+      const code = url.searchParams.get('code');
+      if (!code) {
+        res.writeHead(400, { 'Content-Type': 'text/html' });
+        res.end('<h1>Missing authorization code</h1>');
+        finish(reject, new Error('Google redirected back without an authorization code.'));
+        return;
+      }
+
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      res.end(
+        '<!doctype html><meta charset="utf-8">' +
+          '<body style="font-family:system-ui;text-align:center;padding:60px">' +
+          '<h1>Authorized</h1><p>You can close this tab and return to your terminal.</p>' +
+          '</body>',
+      );
+      finish(resolve, code);
+      server.close();
+    });
+
+    server.on('error', (err) => {
+      finish(reject, new Error(`Could not start local server on port ${port}: ${err.message}`));
+    });
+
+    const timer = setTimeout(() => {
+      finish(reject, new Error('Timed out waiting for the consent screen to complete.'));
+      server.close();
+    }, CONSENT_TIMEOUT_MS);
+
+    server.listen(port, () => {
+      console.log('\nIf your browser did not open, visit this URL manually:\n');
+      console.log('  ' + authUrl.toString() + '\n');
+      openBrowser(authUrl.toString());
+    });
+  });
+}
+
+async function exchangeCodeForTokens({ code, clientId, clientSecret, redirectUri }) {
+  const res = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      code,
+      client_id: clientId,
+      client_secret: clientSecret,
+      redirect_uri: redirectUri,
+      grant_type: 'authorization_code',
+    }),
+  });
+
+  const json = await readJson(res);
+
+  if (!res.ok) {
+    throw new Error(
+      `Token exchange failed (${res.status}): ${json.error_description || json.error || 'unknown error'}`,
+    );
+  }
+
+  return json;
+}
+
+async function verifyBloggerAccess({ refreshToken, clientId, clientSecret, blogId }) {
+  const accessToken = await getAccessToken({ refreshToken, clientId, clientSecret });
+
+  const [blogRes, profileRes] = await Promise.all([
+    fetch(`https://www.googleapis.com/blogger/v3/blogs/${blogId}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    }),
+    fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    }),
+  ]);
+
+  if (!blogRes.ok) {
+    const err = await readJson(blogRes);
+    throw new Error(
+      `Could not read blog ${blogId} (${blogRes.status}): ${err.error?.message || JSON.stringify(err)}\n` +
+        'Check that the Blog ID is correct and that this Google account owns or can edit the blog.',
+    );
+  }
+
+  const blog = await blogRes.json();
+  const profile = profileRes.ok ? await profileRes.json() : {};
+
+  return { title: blog.name, url: blog.url, email: profile.email };
+}
+
+async function getAccessToken({ refreshToken, clientId, clientSecret }) {
+  const res = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id: clientId,
+      client_secret: clientSecret,
+      refresh_token: refreshToken,
+      grant_type: 'refresh_token',
+    }),
+  });
+
+  const json = await readJson(res);
+
+  if (!res.ok) {
+    throw new Error(
+      `Could not mint an access token (${res.status}): ${json.error_description || json.error}`,
+    );
+  }
+
+  return json.access_token;
+}
+
+function saveToEnvFile(values) {
+  let existing = '';
+  if (fs.existsSync(ENV_PATH)) {
+    existing = fs.readFileSync(ENV_PATH, 'utf8');
+  }
+
+  const lines = Object.entries(values).map(([key, value]) => {
+    const pattern = new RegExp(`^${key}=.*$`, 'm');
+    const line = `${key}=${value}`;
+    return pattern.test(existing) ? existing.replace(pattern, line) : line;
+  });
+
+  const merged = existing.trim() ? `${existing.trim()}\n${lines.join('\n')}\n` : `${lines.join('\n')}\n`;
+  fs.writeFileSync(ENV_PATH, merged, 'utf8');
+  fs.chmodSync(ENV_PATH, 0o600);
+}
+
+function openBrowser(url) {
+  const commands = {
+    win32: ['cmd', ['/c', 'start', '', url]],
+    darwin: ['open', [url]],
+    linux: ['xdg-open', [url]],
+  };
+  const [cmd, cmdArgs] = commands[process.platform] || ['xdg-open', [url]];
+  try {
+    spawn(cmd, cmdArgs, { stdio: 'ignore', detached: true, shell: process.platform === 'win32' }).unref();
+  } catch {
+    /* browser auto-open is best effort; the URL is printed above */
+  }
+}
+
+async function ask(question) {
+  const rl = readline.createInterface({ input, output });
+  try {
+    const answer = await rl.question(question);
+    return answer.trim();
+  } finally {
+    rl.close();
+  }
+}
+
+async function readJson(res) {
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { raw: text };
+  }
+}
+
+function parseArgs(argv) {
+  const parsed = {};
+  for (const arg of argv) {
+    const match = /^--([^=]+)(?:=(.*))?$/.exec(arg);
+    if (match) parsed[match[1]] = match[2] ?? true;
+  }
+  return parsed;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}

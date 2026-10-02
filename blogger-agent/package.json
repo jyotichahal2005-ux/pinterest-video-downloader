@@ -1,0 +1,14 @@
+{
+  "name": "pinsaver-blogger-agent",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Automated SEO blogging agent that publishes Pinterest video download guides to Blogger via Groq + Blogger API v3",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "token": "node scripts/generateRefreshToken.js",
+    "post": "node src/index.js"
+  }
+}
