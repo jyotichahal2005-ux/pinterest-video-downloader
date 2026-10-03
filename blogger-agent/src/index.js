@@ -53,11 +53,25 @@ async function main() {
     const posts = await client.listRecentPosts();
     log(`\nMost recent ${posts.length} post(s) on this blog:`);
     for (const p of posts) {
+      const words = countWords(stripHtml(p.content));
+      const links = countBacklinks(p.content || '', site.url);
       log(`  - ${p.title}`);
       log(`    ${p.url}`);
-      log(`    ${p.published}`);
+      log(`    ${p.published}  [${p.status || 'LIVE'}]`);
+      log(`    ${words} words, ${links} backlink(s) to ${site.url}`);
+      const live = await probePostUrl(p.url);
+      if (words === 0) {
+        log(`    PROBLEM: empty body. The post exists but readers get Blogger's 404 page.`);
+      } else if (live === 'missing') {
+        log(`    PROBLEM: the live URL returns Blogger's "page not found".`);
+      } else if (live === 'blocked') {
+        log(`    (live URL returned an anti-bot challenge; check it in a browser)`);
+      }
     }
-    log('\nAll good. The agent is wired to the right blog.\n');
+    if (posts.length === 0) {
+      log('  (none yet - the blog has no posts. Trigger the workflow to publish one.)');
+    }
+    log('');
     return;
   }
 
@@ -242,6 +256,44 @@ function writeLog(history) {
 
 function countBacklinks(content, siteUrl) {
   return (content.match(new RegExp(escapeRegExp(siteUrl), 'g')) || []).length;
+}
+
+/** Rough word count of an HTML fragment, for health checks. */
+function stripHtml(html) {
+  return String(html)
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ');
+}
+
+/**
+ * Ask Blogger's public site whether a post permalink really resolves.
+ * Returns 'ok', 'missing' or 'blocked'. Never throws - a network hiccup here
+ * must not turn a working verify run into a failure.
+ */
+async function probePostUrl(url) {
+  if (!url) return 'unknown';
+  try {
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
+          '(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+      },
+      redirect: 'follow',
+    });
+    if (res.status === 404) return 'missing';
+    if (res.status === 429 || res.status === 503) return 'blocked';
+    if (!res.ok) return `http-${res.status}`;
+    const html = await res.text();
+    if (/page you were looking for|Sorry, the page/i.test(html)) return 'missing';
+    return 'ok';
+  } catch {
+    return 'unreachable';
+  }
 }
 
 function warnIfOutOfRange(wordCount, log) {

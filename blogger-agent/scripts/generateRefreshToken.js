@@ -337,18 +337,36 @@ async function getAccessToken({ refreshToken, clientId, clientSecret }) {
 }
 
 function saveToEnvFile(values) {
-  let existing = '';
-  if (fs.existsSync(ENV_PATH)) {
-    existing = fs.readFileSync(ENV_PATH, 'utf8');
+  const existing = fs.existsSync(ENV_PATH) ? fs.readFileSync(ENV_PATH, 'utf8') : '';
+
+  const comments = [];
+  const order = [];
+  const byKey = new Map();
+
+  const absorb = (line) => {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+    if (trimmed.startsWith('#')) {
+      if (!comments.includes(trimmed)) comments.push(trimmed);
+      return;
+    }
+    const eq = trimmed.indexOf('=');
+    if (eq < 1) return;
+    // Re-running setup has to overwrite the previous value, not stack a second
+    // copy of the same key. loadEnv() takes the first match, so a duplicate
+    // later in the file would be silently ignored.
+    if (!byKey.has(trimmed.slice(0, eq).trim())) order.push(trimmed.slice(0, eq).trim());
+    byKey.set(trimmed.slice(0, eq).trim(), trimmed);
+  };
+
+  existing.split(/\r?\n/).forEach(absorb);
+
+  for (const [key, value] of Object.entries(values)) {
+    if (!byKey.has(key)) order.push(key);
+    byKey.set(key, `${key}=${value}`);
   }
 
-  const lines = Object.entries(values).map(([key, value]) => {
-    const pattern = new RegExp(`^${key}=.*$`, 'm');
-    const line = `${key}=${value}`;
-    return pattern.test(existing) ? existing.replace(pattern, line) : line;
-  });
-
-  const merged = existing.trim() ? `${existing.trim()}\n${lines.join('\n')}\n` : `${lines.join('\n')}\n`;
+  const merged = [...comments, ...order.map((key) => byKey.get(key))].join('\n') + '\n';
   fs.writeFileSync(ENV_PATH, merged, 'utf8');
   fs.chmodSync(ENV_PATH, 0o600);
 }

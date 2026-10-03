@@ -124,9 +124,11 @@ export class BloggerClient {
       kind: 'blogger#post',
       blog: { id: this.blogId },
       title,
-      // Blogger v3 takes raw HTML as a plain string. The older v2 shape
-      // (content: { raw }) is rejected with "Starting an object on a scalar field".
-      rawContent: content,
+      // Blogger v3 takes the post HTML as a plain string on `content`. The v2
+      // shape (content: { raw }) is rejected with "Starting an object on a
+      // scalar field", and there is no `rawContent` field in v3 at all -
+      // sending one is silently ignored and publishes an empty post.
+      content,
       labels,
       // status is deliberately omitted. Its only enum values are
       // LIVE/DRAFT/SCHEDULED/SOFT_TRASHED and the docs say to set it for
@@ -147,10 +149,17 @@ export class BloggerClient {
     };
   }
 
-  /** Used by --verify so you can confirm the agent is wired to the right blog. */
+  /**
+   * Used by --verify so you can confirm the agent is wired to the right blog.
+   *
+   * `content` is requested on purpose. Without it there is no way to tell a
+   * healthy post from a title-only one, which is exactly how an empty publish
+   * slipped through and produced a permalink that 404s for readers.
+   */
   async listRecentPosts(maxResults = 5) {
     const data = await this.request(
-      `/blogs/${this.blogId}/posts?maxResults=${maxResults}&fields=items(id,title,url,published)`,
+      `/blogs/${this.blogId}/posts?maxResults=${maxResults}` +
+        '&view=ADMIN&fields=items(id,title,url,published,status,content)',
       { label: 'posts.list' },
     );
     return data.items || [];
