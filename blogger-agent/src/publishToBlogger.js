@@ -95,6 +95,24 @@ export class BloggerClient {
   async verifyAccess() {
     const blog = await this.request(`/blogs/${this.blogId}`, { label: 'blogs.get' });
     this.log(`  connected to blog "${blog.name}" (${blog.url || this.blogUrl})`);
+
+    // Reading a blog only needs public access. Writing needs author rights, so
+    // check for them explicitly and fail here rather than at posts.insert.
+    const { items = [] } = await this.request('/users/self/blogs', { label: 'users.blogs' });
+    const canWrite = items.some((entry) => entry.id === this.blogId);
+
+    if (!canWrite) {
+      throw new Error(
+        `The signed-in Google account cannot post to this blog.\n` +
+          `  Blog: ${blog.name} (${this.blogId})\n` +
+          `  The account has read access but no author rights, which is why writes are refused.\n\n` +
+          `Fix: open https://www.blogger.com while signed in with the account that owns the\n` +
+          `blog, then run this script again with THAT account. If the blog is listed under a\n` +
+          `different account, that is the one to use.`,
+      );
+    }
+
+    this.log('  write access confirmed (account is a blog author)');
     return { title: blog.name, url: blog.url, id: blog.id };
   }
 
@@ -106,9 +124,13 @@ export class BloggerClient {
       kind: 'blogger#post',
       blog: { id: this.blogId },
       title,
-      content: { raw: content },
+      // Blogger v3 takes raw HTML as a plain string. The older v2 shape
+      // (content: { raw }) is rejected with "Starting an object on a scalar field".
+      rawContent: content,
       labels,
-      status: 'publish',
+      // status is deliberately omitted. Its only enum values are
+      // LIVE/DRAFT/SCHEDULED/SOFT_TRASHED and the docs say to set it for
+      // admin-level requests only. Omitting it publishes the post as LIVE.
     };
 
     const post = await this.request(`/blogs/${this.blogId}/posts`, {
