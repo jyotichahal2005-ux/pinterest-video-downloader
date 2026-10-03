@@ -119,6 +119,15 @@ function waitForAuthCode({ port, redirectUri, clientId }) {
     authUrl.searchParams.set('prompt', 'consent');
     authUrl.searchParams.set('include_granted_scopes', 'true');
 
+    const authUrlString = authUrl.toString();
+
+    // A long URL copied out of a wrapped terminal gets truncated, which is
+    // what causes "invalid_request: response_type missing". Serving the link
+    // from a local page means it is never retyped or pasted by hand.
+    assertAuthUrl(authUrlString);
+
+    const landingUrl = `http://localhost:${port}/`;
+
     let settled = false;
     const finish = (fn, value) => {
       if (settled) return;
@@ -130,8 +139,20 @@ function waitForAuthCode({ port, redirectUri, clientId }) {
     const server = http.createServer((req, res) => {
       const url = new URL(req.url, redirectUri);
 
+      if (url.pathname === '/') {
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.end(consentPage(authUrlString, landingUrl));
+        return;
+      }
+
+      if (url.pathname === '/favicon.ico') {
+        res.writeHead(204).end();
+        return;
+      }
+
       if (url.pathname !== '/oauth2callback') {
-        res.writeHead(404).end('Not found');
+        res.writeHead(404, { 'Content-Type': 'text/html' });
+        res.end('<h1>Not found</h1>');
         return;
       }
 
@@ -139,7 +160,7 @@ function waitForAuthCode({ port, redirectUri, clientId }) {
       if (error) {
         const description =
           url.searchParams.get('error_description') || 'Authorization was denied.';
-        res.writeHead(400, { 'Content-Type': 'text/html' });
+        res.writeHead(400, { 'Content-Type': 'text/html; charset=utf-8' });
         res.end(`<h1>Authorization failed</h1><p>${escapeHtml(description)}</p>`);
         finish(reject, new Error(`${error}: ${description}`));
         return;
@@ -147,13 +168,13 @@ function waitForAuthCode({ port, redirectUri, clientId }) {
 
       const code = url.searchParams.get('code');
       if (!code) {
-        res.writeHead(400, { 'Content-Type': 'text/html' });
+        res.writeHead(400, { 'Content-Type': 'text/html; charset=utf-8' });
         res.end('<h1>Missing authorization code</h1>');
         finish(reject, new Error('Google redirected back without an authorization code.'));
         return;
       }
 
-      res.writeHead(200, { 'Content-Type': 'text/html' });
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       res.end(
         '<!doctype html><meta charset="utf-8">' +
           '<body style="font-family:system-ui;text-align:center;padding:60px">' +
@@ -174,11 +195,61 @@ function waitForAuthCode({ port, redirectUri, clientId }) {
     }, CONSENT_TIMEOUT_MS);
 
     server.listen(port, () => {
-      console.log('\nIf your browser did not open, visit this URL manually:\n');
-      console.log('  ' + authUrl.toString() + '\n');
-      openBrowser(authUrl.toString());
+      console.log('\nOpen this page in your browser:\n');
+      console.log('  ' + landingUrl + '\n');
+      console.log('It has one button. Click it, sign in, then press Allow.\n');
+      console.log('Waiting for consent...\n');
+      openBrowser(landingUrl);
     });
   });
+}
+
+/** Fail loudly here rather than after a confusing Google 400. */
+function assertAuthUrl(urlString) {
+  const parsed = new URL(urlString);
+  const required = ['client_id', 'redirect_uri', 'response_type', 'scope'];
+
+  for (const param of required) {
+    if (!parsed.searchParams.get(param)) {
+      throw new Error(`Built an invalid auth URL: "${param}" is missing.`);
+    }
+  }
+
+  if (parsed.searchParams.get('response_type') !== 'code') {
+    throw new Error('Built an invalid auth URL: response_type must be "code".');
+  }
+}
+
+function consentPage(authUrl, landingUrl) {
+  const safeUrl = escapeHtml(authUrl);
+
+  return `<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PinSaver Blogger agent - Google authorization</title>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:#0f1115; color:#e6e6e6;
+         display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; padding:24px; }
+  .card { background:#171a21; border:1px solid #2a2f3a; border-radius:14px; padding:40px; max-width:520px; width:100%; }
+  h1 { margin:0 0 8px; font-size:20px; }
+  p { color:#a0a6b4; line-height:1.6; margin:0 0 20px; font-size:14px; }
+  ol { color:#a0a6b4; line-height:1.8; font-size:14px; padding-left:20px; margin:0 0 24px; }
+  a.btn { display:block; text-align:center; background:#e60023; color:#fff; text-decoration:none;
+          padding:14px 20px; border-radius:8px; font-weight:600; font-size:15px; }
+  a.btn:hover { background:#ff1744; }
+</style>
+<div class="card">
+  <h1>Connect your Blogger blog</h1>
+  <p>The PinSaver agent needs permission to publish posts to your blog. Nothing is shared with anyone else.</p>
+  <ol>
+    <li>Click the button below.</li>
+    <li>Sign in with the Google account that <strong>owns the blog</strong>.</li>
+    <li>Review the permissions and press <strong>Allow</strong>.</li>
+  </ol>
+  <a class="btn" href="${safeUrl}">Authorize with Google</a>
+</div>
+</html>`;
 }
 
 async function exchangeCodeForTokens({ code, clientId, clientSecret, redirectUri }) {
@@ -272,16 +343,19 @@ function saveToEnvFile(values) {
 }
 
 function openBrowser(url) {
-  const commands = {
-    win32: ['cmd', ['/c', 'start', '', url]],
-    darwin: ['open', [url]],
-    linux: ['xdg-open', [url]],
-  };
-  const [cmd, cmdArgs] = commands[process.platform] || ['xdg-open', [url]];
+  // rundll32 + FileProtocolHandler is the most reliable way to hand a URL to
+  // the default browser on Windows without a shell-quoting dependency.
+  const [cmd, cmdArgs] =
+    process.platform === 'win32'
+      ? ['rundll32', ['url.dll,FileProtocolHandler', url]]
+      : process.platform === 'darwin'
+        ? ['open', [url]]
+        : ['xdg-open', [url]];
+
   try {
-    spawn(cmd, cmdArgs, { stdio: 'ignore', detached: true, shell: process.platform === 'win32' }).unref();
+    spawn(cmd, cmdArgs, { stdio: 'ignore', detached: true }).unref();
   } catch {
-    /* browser auto-open is best effort; the URL is printed above */
+    /* auto-open is best effort; the console message has the address */
   }
 }
 
