@@ -45,16 +45,17 @@ const redirectUri = args['redirect-uri'] || `http://localhost:${port}/oauth2call
 const blogId = args['blog-id'] || process.env.BLOGGER_BLOG_ID || DEFAULT_BLOG_ID;
 
 main().catch((err) => {
-  console.error(`\n[fail] ${err.message}`);
-  process.exit(1);
+  console.error(`\n[fail] ${err.message}\n`);
+  // Set the code instead of calling process.exit, which tears down sockets
+  // mid-flight and makes Node abort with an assertion on Windows.
+  process.exitCode = 1;
 });
 
 async function main() {
   console.log('\n=== PinSaver Blogger agent - OAuth refresh token setup ===\n');
 
-  const resolvedClientId = clientId || (await ask('Google OAuth Client ID: '));
-  const resolvedClientSecret =
-    clientSecret || (await ask('Google OAuth Client Secret: '));
+  const { clientId: resolvedClientId, clientSecret: resolvedClientSecret } =
+    await resolveCredentials();
 
   if (!resolvedClientId || !resolvedClientSecret) {
     throw new Error('Client ID and Client Secret are both required.');
@@ -133,6 +134,9 @@ function waitForAuthCode({ port, redirectUri, clientId }) {
       if (settled) return;
       settled = true;
       clearTimeout(timer);
+      // Always release the port, on success and on failure alike. Leaving it
+      // open makes the process hang and then trip a Node assertion on exit.
+      server.close();
       fn(value);
     };
 
@@ -182,7 +186,6 @@ function waitForAuthCode({ port, redirectUri, clientId }) {
           '</body>',
       );
       finish(resolve, code);
-      server.close();
     });
 
     server.on('error', (err) => {
@@ -359,14 +362,52 @@ function openBrowser(url) {
   }
 }
 
-async function ask(question) {
-  const rl = readline.createInterface({ input, output });
+/**
+ * Ask for anything not supplied via env or flags.
+ *
+ * One readline interface is used for the whole exchange. Creating a new
+ * interface per question closes stdin, which loses buffered input and can
+ * hang when stdin is not an interactive terminal.
+ */
+async function resolveCredentials() {
+  if (clientId && clientSecret) {
+    return { clientId, clientSecret };
+  }
+
+  // Piped or redirected stdin: readline buffers whole chunks, which can leave
+  // the second question waiting on input it already consumed. Read it all once.
+  if (!stdin.isTTY) {
+    const lines = (await readStream(stdin)).split(/\r?\n/);
+    const [pipedId, pipedSecret] = lines.map((line) => line.trim());
+    return {
+      clientId: clientId || pipedId,
+      clientSecret: clientSecret || pipedSecret,
+    };
+  }
+
+  const rl = readline.createInterface({ input: stdin, output: stdout });
+
   try {
-    const answer = await rl.question(question);
-    return answer.trim();
+    const askedId = clientId || (await rl.question('Google OAuth Client ID: '));
+    const askedSecret =
+      clientSecret || (await rl.question('Google OAuth Client Secret: '));
+
+    return { clientId: askedId.trim(), clientSecret: askedSecret.trim() };
   } finally {
     rl.close();
   }
+}
+
+function readStream(stream) {
+  return new Promise((resolve, reject) => {
+    let data = '';
+    stream.setEncoding('utf8');
+    stream.on('data', (chunk) => {
+      data += chunk;
+    });
+    stream.on('end', () => resolve(data));
+    stream.on('error', reject);
+  });
 }
 
 async function readJson(res) {
