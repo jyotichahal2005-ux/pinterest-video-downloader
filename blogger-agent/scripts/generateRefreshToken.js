@@ -34,7 +34,8 @@ const SCOPES = [
 
 const DEFAULT_PORT = 3000;
 const DEFAULT_BLOG_ID = '7265988019810439292';
-const CONSENT_TIMEOUT_MS = 5 * 60 * 1000;
+// Generous by default: you need time to log in and click Allow.
+const CONSENT_TIMEOUT_MS = Number(process.env.OAUTH_TIMEOUT_SECONDS || 900) * 1000;
 
 const args = parseArgs(process.argv.slice(2));
 
@@ -201,10 +202,17 @@ function waitForAuthCode({ port, redirectUri, clientId }) {
       console.log('\nOpen this page in your browser:\n');
       console.log('  ' + landingUrl + '\n');
       console.log('It has one button. Click it, sign in, then press Allow.\n');
-      console.log('Waiting for consent...\n');
+      console.log(`Waiting for consent (${formatTimeout(CONSENT_TIMEOUT_MS)})...\n`);
       openBrowser(landingUrl);
     });
   });
+}
+
+function formatTimeout(ms) {
+  const seconds = Math.round(ms / 1000);
+  if (seconds < 60) return `up to ${seconds} seconds`;
+  const minutes = Math.round(seconds / 60);
+  return `up to ${minutes} minute${minutes === 1 ? '' : 's'}`;
 }
 
 /** Fail loudly here rather than after a confusing Google 400. */
