@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "dependencies": {
+    "mongodb": "^6.12.0"
+  },
   "scripts": {
     "start": "node server.mjs",
     "dev": "node server.mjs"
