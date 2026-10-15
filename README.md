@@ -2,7 +2,7 @@
 
 A free website to download Pinterest videos in HD. Paste a public video link and save it as MP4. No login, no watermark.
 
-![screenshot](IMAGE-LINK)
+<img src="https://github.com/user-attachments/assets/15505984-4f45-465c-81e5-cca98ba256a7" alt="PinSaver" width="100%" />
 
 ## ✨ Features
 - Download in 480p, 720p or 1080p MP4
